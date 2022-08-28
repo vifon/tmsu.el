@@ -83,8 +83,9 @@ the file at point."
 ;;;###autoload
 (defun tmsu-edit-dired-dwim ()
   (interactive)
-  (tmsu-edit-dired
-   (not (file-directory-p (dired-get-filename t t)))))
+  (let* ((file (dired-get-filename t t))
+         (is-directory (and file (file-directory-p file))))
+    (tmsu-edit-dired (not is-directory))))
 
 
 (provide 'tmsu)
