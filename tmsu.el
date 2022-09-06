@@ -56,6 +56,9 @@
                                              (string-join tags-old ",")))
          (tags-added (cl-set-difference tags-new tags-old :test #'string=))
          (tags-removed (cl-set-difference tags-old tags-new :test #'string=)))
+    (unless (or tags-added
+                tags-removed)
+      (user-error "No changes"))
     (apply #'call-process
            "tmsu" nil nil nil
            "untag" file
@@ -63,8 +66,17 @@
     (apply #'call-process
            "tmsu" nil nil nil
            "tag" "--explicit" file
-           tags-added))
-  (message "%S" (tmsu--get-tags file)))
+           tags-added)
+    (message "%S: %s"
+             (tmsu--get-tags file)
+             (mapconcat #'identity
+                        (nconc (mapcar (lambda (tag)
+                                         (concat "-" tag))
+                                       tags-removed)
+                               (mapcar (lambda (tag)
+                                         (concat "+" tag))
+                                       tags-added))
+                        " "))))
 
 ;;;###autoload
 (defun tmsu-edit-dired (parent)
