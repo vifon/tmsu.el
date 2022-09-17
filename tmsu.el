@@ -27,6 +27,20 @@
 
 (require 'cl-lib)
 
+
+(defgroup tmsu nil
+  "A basic TMSU interface.")
+
+
+(defface tmsu-added-face
+  '((t (:inherit diff-added)))
+  "The faced used to display the added tags.")
+
+(defface tmsu-removed-face
+  '((t (:inherit diff-removed)))
+  "The face used to display the removed tags.")
+
+
 (defun tmsu--get-tags (&optional file)
   (split-string-shell-command
    (string-trim-right
@@ -71,10 +85,14 @@
              (tmsu--get-tags file)
              (mapconcat #'identity
                         (nconc (mapcar (lambda (tag)
-                                         (concat "-" tag))
+                                         (concat "-"
+                                                 (propertize tag
+                                                             'face 'tmsu-removed-face)))
                                        tags-removed)
                                (mapcar (lambda (tag)
-                                         (concat "+" tag))
+                                         (concat "+"
+                                                 (propertize tag
+                                                             'face 'tmsu-added-face)))
                                        tags-added))
                         " "))))
 
