@@ -42,6 +42,9 @@ the file at point."
 
 ;;;###autoload
 (defun tmsu-edit-dired-dwim ()
+  "Edit the current file's tags.
+
+If it's not a directory, edit the parent."
   (interactive)
   (let* ((file (dired-get-filename t t))
          (is-directory (and file (file-directory-p file))))
@@ -62,7 +65,7 @@ the file at point."
 
 ;;;###autoload
 (defun tmsu-query-dired (query &optional flags)
-  "Display the query results as a dired buffer.
+  "Display the `tmsu' query results as a `dired' buffer.
 
 Interactively ask for the flags only if \\[universal-argument] got passed."
   (interactive (if (tmsu-database-p)
