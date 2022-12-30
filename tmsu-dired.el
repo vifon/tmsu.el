@@ -61,14 +61,22 @@ the file at point."
   "The last `tmsu' query used by \\[tmsu-query-dired].")
 
 ;;;###autoload
-(defun tmsu-query-dired (query)
-  "Display the query results in a virtual dired buffer."
+(defun tmsu-query-dired (query &optional flags)
+  "Display the query results as a dired buffer.
+
+Interactively ask for the flags only if \\[universal-argument] got passed."
   (interactive (if (tmsu-database-p)
                    (list (completing-read "TMSU query: "
-                                          (tmsu--get-tags)))
+                                          (tmsu--get-tags)
+                                          nil nil nil nil
+                                          tmsu-query)
+                         (when current-prefix-arg
+                           (read-from-minibuffer "Additional `tmsu files' flags: ")))
                  (error "No TMSU database")))
 
-  (let ((dired-buffers dired-buffers))
+  (let ((dired-buffers dired-buffers)
+        (dir default-directory)
+        command)
     (pop-to-buffer-same-window (get-buffer-create "*tmsu*"))
 
     ;; See if there's still a `tmsu' running, and offer to kill it
@@ -90,18 +98,27 @@ the file at point."
     (kill-all-local-variables)
     (setq buffer-read-only nil)
     (erase-buffer)
-    (setq tmsu-query query)
+    (setq tmsu-query query
+          default-directory dir
+          command (format "tmsu files%s --path %s -0 %s | xargs -0 ls -d %s"
+                       (if flags
+                           (concat " " flags)
+                         "")
+                       (shell-quote-argument dir)
+                       (shell-quote-argument query)
+                       tmsu-ls-switches))
 
-    (shell-command (format "tmsu files -0 %s | xargs -0 ls -d %s &"
-                           (shell-quote-argument query)
-                           tmsu-ls-switches)
-                   (current-buffer))
-    (dired-mode default-directory tmsu-ls-switches)
+    (shell-command (concat command "&") (current-buffer))
+    (dired-mode dir tmsu-ls-switches)
+    (let ((map (make-sparse-keymap)))
+      (set-keymap-parent map (current-local-map))
+      (define-key map (kbd "s") #'tmsu-query-dired)
+      (use-local-map map))
 
     (setq-local dired-sort-inhibit t)
     (setq-local revert-buffer-function
                 (lambda (_ignore-auto _noconfirm)
-                  (tmsu-query-dired tmsu-query)))
+                  (tmsu-query-dired query flags)))
     ;; Set subdir-alist so that Tree Dired will work:
     (if (fboundp 'dired-simple-subdir-alist)
 	;; will work even with nested dired format (dired-nstd.el,v 1.15
@@ -110,17 +127,17 @@ the file at point."
       ;; else we have an ancient tree dired (or classic dired, where
       ;; this does no harm)
       (setq-local dired-subdir-alist
-                  (list (cons default-directory (point-min-marker)))))
+                  (list (cons dir (point-min-marker)))))
     (setq-local dired-subdir-switches tmsu-ls-subdir-switches)
 
     (setq buffer-read-only nil)
     ;; Subdir headlerline must come first because the first marker in
     ;; subdir-alist points there.
-    (insert "  " default-directory ":\n")
+    (insert "  " dir ":\n")
     ;; Make second line a ``tmsu'' line in analogy to the ``total'' or
     ;; ``wildcard'' line.
     (let ((point (point)))
-      (insert "  tmsu files " tmsu-query "\n")
+      (insert "  " command "\n")
       (dired-insert-set-properties point (point)))
     (setq buffer-read-only t)
     (let ((proc (get-buffer-process (current-buffer))))
