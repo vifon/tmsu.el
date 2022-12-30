@@ -113,6 +113,7 @@ Interactively ask for the flags only if \\[universal-argument] got passed."
     (let ((map (make-sparse-keymap)))
       (set-keymap-parent map (current-local-map))
       (define-key map (kbd "s") #'tmsu-query-dired)
+      (define-key map "\C-c\C-k" #'kill-find) ; Should be safe to reuse verbatim.
       (use-local-map map))
 
     (setq-local dired-sort-inhibit t)
