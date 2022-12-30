@@ -100,45 +100,5 @@
                                        tags-added))
                         " "))))
 
-;;;###autoload
-(defun tmsu-edit-dired (parent)
-  "Edit the tags of the file at point.
-
-If PARENT is non-nil, edit the current directory instead of
-the file at point."
-  (interactive "P")
-  (let ((file (if parent
-                  (dired-current-directory)
-                (dired-get-filename t t))))
-    (if file
-        (tmsu-edit file)
-      (user-error "No file on this line"))))
-
-;;;###autoload
-(defun tmsu-edit-dired-dwim ()
-  (interactive)
-  (let* ((file (dired-get-filename t t))
-         (is-directory (and file (file-directory-p file))))
-    (tmsu-edit-dired (not is-directory))))
-
-;;;###autoload
-(defun tmsu-query-dired (query)
-  "Display the query results in a virtual dired buffer."
-  (interactive (if (tmsu-database-p)
-                   (list (completing-read "TMSU query: "
-                                          (tmsu--get-tags)))
-                 (error "No TMSU database")))
-  (with-current-buffer (get-buffer-create "*tmsu*")
-    (fundamental-mode)
-    (read-only-mode 0)
-    (erase-buffer)
-    (shell-command (format "tmsu files -0 %s | xargs -0 ls -lhd" (shell-quote-argument query))
-                   t)
-    (virtual-dired default-directory)
-    (setq-local tmsu-query query)
-    (setq header-line-format '("tmsu files " tmsu-query))
-    (switch-to-buffer (current-buffer))))
-
-
 (provide 'tmsu)
 ;;; tmsu.el ends here
