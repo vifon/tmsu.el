@@ -57,8 +57,8 @@ If it's not a directory, edit the parent."
 
 (require 'find-dired)
 
-(defvar tmsu-ls-switches "-lhb")
-(defvar tmsu-ls-subdir-switches "-alhb")
+(defvar tmsu-ls-switches "-lh --quoting-style=literal")
+(defvar tmsu-ls-subdir-switches "-alh --quoting-style=literal")
 
 (defvar tmsu-query nil
   "The last `tmsu' query used by \\[tmsu-query-dired].")
