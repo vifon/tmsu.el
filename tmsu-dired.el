@@ -83,16 +83,16 @@ Interactively ask for the flags only if \\[universal-argument] got passed."
     ;; first, if it is.
     (let ((tmsu (get-buffer-process (current-buffer))))
       (when tmsu
-	    (if (or (not (eq (process-status tmsu) 'run))
-		        (yes-or-no-p
-		         (format-message "A `tmsu' process is running; kill it? ")))
-	        (condition-case nil
-		        (progn
-		          (interrupt-process tmsu)
-		          (sit-for 1)
-		          (delete-process tmsu))
-	          (error nil))
-	      (error "Cannot have two processes in `%s' at once" (buffer-name)))))
+        (if (or (not (eq (process-status tmsu) 'run))
+                (yes-or-no-p
+                 (format-message "A `tmsu' process is running; kill it? ")))
+            (condition-case nil
+                (progn
+                  (interrupt-process tmsu)
+                  (sit-for 1)
+                  (delete-process tmsu))
+              (error nil))
+          (error "Cannot have two processes in `%s' at once" (buffer-name)))))
 
     (widen)
     (kill-all-local-variables)
@@ -101,12 +101,12 @@ Interactively ask for the flags only if \\[universal-argument] got passed."
     (setq tmsu-query query
           default-directory dir
           command (format "tmsu files%s --path %s -0 %s | xargs -0 ls -d %s"
-                       (if flags
-                           (concat " " flags)
-                         "")
-                       (shell-quote-argument dir)
-                       (shell-quote-argument query)
-                       tmsu-ls-switches))
+                          (if flags
+                              (concat " " flags)
+                            "")
+                          (shell-quote-argument dir)
+                          (shell-quote-argument query)
+                          tmsu-ls-switches))
 
     (shell-command (concat command "&") (current-buffer))
     (dired-mode dir tmsu-ls-switches)
@@ -121,9 +121,9 @@ Interactively ask for the flags only if \\[universal-argument] got passed."
                   (tmsu-query-dired query flags)))
     ;; Set subdir-alist so that Tree Dired will work:
     (if (fboundp 'dired-simple-subdir-alist)
-	;; will work even with nested dired format (dired-nstd.el,v 1.15
-	;; and later)
-	(dired-simple-subdir-alist)
+        ;; will work even with nested dired format (dired-nstd.el,v 1.15
+        ;; and later)
+        (dired-simple-subdir-alist)
       ;; else we have an ancient tree dired (or classic dired, where
       ;; this does no harm)
       (setq-local dired-subdir-alist
@@ -154,9 +154,9 @@ Interactively ask for the flags only if \\[universal-argument] got passed."
   "Sentinel for \\[tmsu-query-dired] processes."
   (let ((buf (process-buffer proc)))
     (if (buffer-name buf)
-	    (with-current-buffer buf
-	      (let ((inhibit-read-only t))
-	        (save-excursion
+        (with-current-buffer buf
+          (let ((inhibit-read-only t))
+            (save-excursion
               (save-restriction
                 (widen)
                 (let ((point (point-max)))
@@ -166,13 +166,13 @@ Interactively ask for the flags only if \\[universal-argument] got passed."
                           " at " (substring (current-time-string) 0 19))
                   (dired-insert-set-properties point (point))))
               (setq mode-line-process
-		            (format ":%s" (process-status proc)))
-	          ;; Since the buffer and mode line will show that the
-	          ;; process is dead, we can delete it now.  Otherwise it
-	          ;; will stay around until M-x `list-processes'.
-	          (delete-process proc)
-	          (force-mode-line-update))))
-	  (message "tmsu-query-dired %s finished." buf))))
+                    (format ":%s" (process-status proc)))
+              ;; Since the buffer and mode line will show that the
+              ;; process is dead, we can delete it now.  Otherwise it
+              ;; will stay around until M-x `list-processes'.
+              (delete-process proc)
+              (force-mode-line-update))))
+      (message "tmsu-query-dired %s finished." buf))))
 
 (provide 'tmsu-dired)
 ;;; tmsu-dired.el ends here
