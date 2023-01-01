@@ -96,6 +96,7 @@ A sensible example: \"episodes-watched=\""
 
 ;;;###autoload
 (defun tmsu-edit (file)
+  "Interactively edit the TMSU tags of FILE."
   (interactive "f")
   (unless (tmsu-database-p)
     (error "No TMSU database"))
