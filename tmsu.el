@@ -76,19 +76,19 @@ A sensible example: \"episodes-watched=\""
       (group (* any))))
 
 (defun tmsu--completion (&optional tags)
-  (let ((all-tags (or tags (tmsu--get-tags))))
-    (completion-table-dynamic
-     (lambda (string)
-       (string-match tmsu--key-value-regex string)
-       (let* ((key (match-string 1 string))
-              ;; (value (match-string 2 string))
-              (candidates (if key
-                              (mapcar
-                               (lambda (value)
-                                 (concat key "=" value))
-                               (tmsu--get-values key))
-                            all-tags)))
-         candidates)))))
+  (setq tags (or tags (tmsu--get-tags)))
+  (completion-table-dynamic
+   (lambda (string)
+     (string-match tmsu--key-value-regex string)
+     (let* ((key (match-string 1 string))
+            ;; (value (match-string 2 string))
+            (candidates (if key
+                            (mapcar
+                             (lambda (value)
+                               (concat key "=" value))
+                             (tmsu--get-values key))
+                          tags)))
+       candidates))))
 
 (defun tmsu-database-p ()
   "Check whether a TMSU database exists for the current directory."
