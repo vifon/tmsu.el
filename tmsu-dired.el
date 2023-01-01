@@ -66,12 +66,18 @@ If it's not a directory, edit the parent."
   "The last `tmsu' query used by \\[tmsu-dired-query].")
 
 ;;;###autoload
-(defun tmsu-dired-query (query &optional flags)
+(defun tmsu-dired-query (dir query &optional flags)
   "Display the `tmsu' QUERY results as a `dired' buffer.
+
+The query is anchored at DIR as the working directory.
+Interactively it's always the current directory.
 
 Interactively ask for the FLAGS only if \\[universal-argument] got passed."
   (interactive (if (tmsu-database-p)
-                   (list (string-join
+                   (list (if (eq major-mode 'dired-mode)
+                             (dired-current-directory)
+                           default-directory)
+                         (string-join
                           (completing-read-multiple "TMSU query: "
                                                     (tmsu--completion tmsu--comparison-regex)
                                                     nil nil nil nil
@@ -82,7 +88,6 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
                  (error "No TMSU database")))
 
   (let ((dired-buffers dired-buffers)
-        (dir default-directory)
         command)
     (pop-to-buffer-same-window (get-buffer-create "*tmsu*"))
 
@@ -126,7 +131,7 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
     (setq-local dired-sort-inhibit t)
     (setq-local revert-buffer-function
                 (lambda (_ignore-auto _noconfirm)
-                  (tmsu-dired-query query flags)))
+                  (tmsu-dired-query dir query flags)))
     ;; Set subdir-alist so that Tree Dired will work:
     (if (fboundp 'dired-simple-subdir-alist)
         ;; will work even with nested dired format (dired-nstd.el,v 1.15
