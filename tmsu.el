@@ -43,6 +43,15 @@
   '((t (:inherit diff-removed)))
   "The face used to display the removed tags.")
 
+(defcustom tmsu-priority-tag nil
+  "A tag (actually a prefix) to always sort as the last one for easy editing.
+
+A sensible example: \"episodes-watched=\""
+  :type '(choice
+          (const :tag "None" nil)
+          (string))
+  :safe #'stringp)
+
 
 (defun tmsu--get-tags (&optional file)
   (split-string-shell-command
@@ -91,7 +100,12 @@
   (unless (tmsu-database-p)
     (error "No TMSU database"))
   (let* ((tags-all (tmsu--get-tags))
-         (tags-old (tmsu--get-tags file))
+         (tags-old (if tmsu-priority-tag
+                       (sort (tmsu--get-tags file)
+                             (lambda (a b)
+                               (or (string< a b)
+                                   (string-prefix-p tmsu-priority-tag b))))
+                     (tmsu--get-tags file)))
          (tags-new (completing-read-multiple "Tags: "
                                              (tmsu--completion tags-all)
                                              nil nil
