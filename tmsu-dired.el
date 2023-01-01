@@ -69,10 +69,12 @@ If it's not a directory, edit the parent."
 
 Interactively ask for the flags only if \\[universal-argument] got passed."
   (interactive (if (tmsu-database-p)
-                   (list (completing-read "TMSU query: "
-                                          (tmsu--completion)
-                                          nil nil nil nil
-                                          tmsu-query)
+                   (list (string-join
+                          (completing-read-multiple "TMSU query: "
+                                                    (tmsu--completion)
+                                                    nil nil nil nil
+                                                    tmsu-query)
+                          " ")
                          (when current-prefix-arg
                            (read-from-minibuffer "Additional `tmsu files' flags: ")))
                  (error "No TMSU database")))
