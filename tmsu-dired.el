@@ -29,7 +29,7 @@
 (require 'tmsu)
 
 ;;;###autoload
-(defun tmsu-edit-dired (parent)
+(defun tmsu-dired-edit (parent)
   "Edit the tags of the file at point.
 
 If PARENT is non-nil, edit the current directory instead of
@@ -43,14 +43,14 @@ the file at point."
       (user-error "No file on this line"))))
 
 ;;;###autoload
-(defun tmsu-edit-dired-dwim ()
+(defun tmsu-dired-edit-dwim ()
   "Edit the current file's tags.
 
 If it's not a directory, edit the parent."
   (interactive)
   (let* ((file (dired-get-filename t t))
          (is-directory (and file (file-directory-p file))))
-    (tmsu-edit-dired (not is-directory))))
+    (tmsu-dired-edit (not is-directory))))
 
 
 ;; This section is strongly inspired by find-dired.el (included in GNU
@@ -59,14 +59,14 @@ If it's not a directory, edit the parent."
 
 (require 'find-dired)
 
-(defvar tmsu-ls-switches "-lh --quoting-style=literal")
-(defvar tmsu-ls-subdir-switches "-alh --quoting-style=literal")
+(defvar tmsu-dired-ls-switches "-lh --quoting-style=literal")
+(defvar tmsu-dired-ls-subdir-switches "-alh --quoting-style=literal")
 
-(defvar tmsu-query nil
-  "The last `tmsu' query used by \\[tmsu-query-dired].")
+(defvar tmsu-dired-query nil
+  "The last `tmsu' query used by \\[tmsu-dired-query].")
 
 ;;;###autoload
-(defun tmsu-query-dired (query &optional flags)
+(defun tmsu-dired-query (query &optional flags)
   "Display the `tmsu' QUERY results as a `dired' buffer.
 
 Interactively ask for the FLAGS only if \\[universal-argument] got passed."
@@ -75,7 +75,7 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
                           (completing-read-multiple "TMSU query: "
                                                     (tmsu--completion)
                                                     nil nil nil nil
-                                                    tmsu-query)
+                                                    tmsu-dired-query)
                           " ")
                          (when current-prefix-arg
                            (read-from-minibuffer "Additional `tmsu files' flags: ")))
@@ -105,7 +105,7 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
     (kill-all-local-variables)
     (setq buffer-read-only nil)
     (erase-buffer)
-    (setq tmsu-query query
+    (setq tmsu-dired-query query
           default-directory dir
           command (format "tmsu files%s --path %s -0 %s | xargs -0 ls -d %s"
                           (if flags
@@ -113,20 +113,20 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
                             "")
                           (shell-quote-argument dir)
                           (shell-quote-argument query)
-                          tmsu-ls-switches))
+                          tmsu-dired-ls-switches))
 
     (shell-command (concat command "&") (current-buffer))
-    (dired-mode dir tmsu-ls-switches)
+    (dired-mode dir tmsu-dired-ls-switches)
     (let ((map (make-sparse-keymap)))
       (set-keymap-parent map (current-local-map))
-      (define-key map (kbd "s") #'tmsu-query-dired)
+      (define-key map (kbd "s") #'tmsu-dired-query)
       (define-key map "\C-c\C-k" #'kill-find) ; Should be safe to reuse verbatim.
       (use-local-map map))
 
     (setq-local dired-sort-inhibit t)
     (setq-local revert-buffer-function
                 (lambda (_ignore-auto _noconfirm)
-                  (tmsu-query-dired query flags)))
+                  (tmsu-dired-query query flags)))
     ;; Set subdir-alist so that Tree Dired will work:
     (if (fboundp 'dired-simple-subdir-alist)
         ;; will work even with nested dired format (dired-nstd.el,v 1.15
@@ -136,7 +136,7 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
       ;; this does no harm)
       (setq-local dired-subdir-alist
                   (list (cons dir (point-min-marker)))))
-    (setq-local dired-subdir-switches tmsu-ls-subdir-switches)
+    (setq-local dired-subdir-switches tmsu-dired-ls-subdir-switches)
 
     (setq buffer-read-only nil)
     ;; Subdir headlerline must come first because the first marker in
@@ -159,7 +159,7 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
     (setq mode-line-process '(":%s"))))
 
 (defun tmsu-dired-sentinel (proc state)
-  "Sentinel for \\[tmsu-query-dired] processes."
+  "Sentinel for \\[tmsu-dired-query] processes."
   (let ((buf (process-buffer proc)))
     (if (buffer-name buf)
         (with-current-buffer buf
@@ -180,7 +180,7 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
               ;; will stay around until M-x `list-processes'.
               (delete-process proc)
               (force-mode-line-update))))
-      (message "tmsu-query-dired %s finished." buf))))
+      (message "tmsu-dired-query %s finished." buf))))
 
 (provide 'tmsu-dired)
 ;;; tmsu-dired.el ends here
