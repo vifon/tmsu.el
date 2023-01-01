@@ -80,21 +80,32 @@ A sensible example: \"episodes-watched=\""
 
 (defconst tmsu--key-value-regex
   (rx bos
-      (group (+ (not "=")))
-      "="
+      (group (+? any))
+      (group "=")
       (group (* any))))
 
-(defun tmsu--completion (&optional tags)
+(defconst tmsu--comparison-regex
+  (rx bos
+      (group (+? any))
+      (group (* space)
+             (or "<="
+                 ">="
+                 (any "<=>"))
+             (* space))
+      (group (* any))))
+
+(defun tmsu--completion (regex &optional tags)
   (setq tags (or tags (tmsu--get-tags)))
   (completion-table-dynamic
    (lambda (string)
-     (string-match tmsu--key-value-regex string)
+     (string-match regex string)
      (let* ((key (match-string 1 string))
-            ;; (value (match-string 2 string))
+            (op (match-string 2 string))
+            ;; (value (match-string 3 string))
             (candidates (if key
                             (mapcar
                              (lambda (value)
-                               (concat key "=" value))
+                               (concat key op value))
                              (tmsu--get-values key))
                           tags)))
        candidates))))
@@ -117,7 +128,8 @@ A sensible example: \"episodes-watched=\""
                                    (string-prefix-p tmsu-priority-tag b))))
                      (tmsu--get-tags file)))
          (tags-new (completing-read-multiple "Tags: "
-                                             (tmsu--completion tags-all)
+                                             (tmsu--completion tmsu--key-value-regex
+                                                               tags-all)
                                              nil nil
                                              (string-join tags-old ",")))
          (tags-added (cl-set-difference tags-new tags-old :test #'string=))

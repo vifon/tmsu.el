@@ -73,7 +73,7 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
   (interactive (if (tmsu-database-p)
                    (list (string-join
                           (completing-read-multiple "TMSU query: "
-                                                    (tmsu--completion)
+                                                    (tmsu--completion tmsu--comparison-regex)
                                                     nil nil nil nil
                                                     tmsu-dired-query)
                           " ")
