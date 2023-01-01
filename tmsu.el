@@ -59,18 +59,24 @@ A sensible example: \"episodes-watched=\""
 (defun tmsu--get-tags (&optional file)
   (split-string-shell-command
    (string-trim-right
-    (shell-command-to-string
-     (apply #'concat "tmsu tags --name=never --explicit"
-            (when file
-              (list " " (shell-quote-argument file))))))))
+    (with-output-to-string
+      (unless (= (apply #'call-process "tmsu" nil standard-output nil
+                        "tags" "--name=never" "--explicit"
+                        (when file
+                          (list file)))
+                 0)
+        (error "Error when running TMSU"))))))
 
 (defun tmsu--get-values (&optional tag)
   (split-string-shell-command
    (string-trim-right
-    (shell-command-to-string
-     (apply #'concat "tmsu values"
-            (when tag
-              (list " " (shell-quote-argument tag))))))))
+    (with-output-to-string
+      (unless (= (apply #'call-process "tmsu" nil standard-output nil
+                        "values"
+                        (when tag
+                          (list tag)))
+                 0)
+        (error "No such tag"))))))
 
 (defconst tmsu--key-value-regex
   (rx bos
