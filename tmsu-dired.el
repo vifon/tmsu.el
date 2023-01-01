@@ -70,7 +70,7 @@ If it's not a directory, edit the parent."
 Interactively ask for the flags only if \\[universal-argument] got passed."
   (interactive (if (tmsu-database-p)
                    (list (completing-read "TMSU query: "
-                                          (tmsu--get-tags)
+                                          (tmsu--completion)
                                           nil nil nil nil
                                           tmsu-query)
                          (when current-prefix-arg
