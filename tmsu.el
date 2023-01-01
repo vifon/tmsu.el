@@ -60,6 +60,27 @@
             (when tag
               (list " " (shell-quote-argument tag))))))))
 
+(defconst tmsu--key-value-regex
+  (rx bos
+      (group (+ (not "=")))
+      "="
+      (group (* any))))
+
+(defun tmsu--completion (&optional tags)
+  (let ((all-tags (or tags (tmsu--get-tags))))
+    (completion-table-dynamic
+     (lambda (string)
+       (string-match tmsu--key-value-regex string)
+       (let* ((key (match-string 1 string))
+              ;; (value (match-string 2 string))
+              (candidates (if key
+                              (mapcar
+                               (lambda (value)
+                                 (concat key "=" value))
+                               (tmsu--get-values key))
+                            all-tags)))
+         candidates)))))
+
 (defun tmsu-database-p ()
   "Check whether a TMSU database exists for the current directory."
   (= (call-process "tmsu" nil nil nil "info") 0))
@@ -72,7 +93,7 @@
   (let* ((tags-all (tmsu--get-tags))
          (tags-old (tmsu--get-tags file))
          (tags-new (completing-read-multiple "Tags: "
-                                             tags-all
+                                             (tmsu--completion tags-all)
                                              nil nil
                                              (string-join tags-old ",")))
          (tags-added (cl-set-difference tags-new tags-old :test #'string=))
