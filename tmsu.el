@@ -1,9 +1,11 @@
-;;; tmsu.el --- A basic TMSU interface for Emacs.    -*- lexical-binding: t; -*-
+;;; tmsu.el --- A basic TMSU interface    -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2022  Wojciech Siewierski
+;; Copyright (C) 2022-2023  Wojciech Siewierski
 
 ;; Author: Wojciech Siewierski
 ;; Keywords: files
+;; Version: 0.9
+;; Package-Requires: ((emacs "28.1"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -20,7 +22,7 @@
 
 ;;; Commentary:
 
-;; A basic TMSU interface for Emacs.
+;; A basic TMSU interface.
 ;; See: https://tmsu.org/
 
 ;;; Code:
@@ -32,7 +34,8 @@
 
 
 (defgroup tmsu nil
-  "A basic TMSU interface.")
+  "A basic TMSU interface."
+  :group 'files)
 
 
 (defface tmsu-added-face

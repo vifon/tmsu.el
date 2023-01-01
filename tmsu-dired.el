@@ -1,9 +1,11 @@
-;;; tmsu-dired.el --- A basic interface between TMSU and dired.    -*- lexical-binding: t; -*-
+;;; tmsu-dired.el --- A basic interface between TMSU and Dired    -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2022  Wojciech Siewierski
+;; Copyright (C) 2022-2023  Wojciech Siewierski
 
 ;; Author: Wojciech Siewierski
 ;; Keywords: files
+;; Version: 0.9
+;; Package-Requires: ((emacs "28.1"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -20,7 +22,7 @@
 
 ;;; Commentary:
 
-;; A basic interface between TMSU and dired.
+;; A basic interface between TMSU and Dired.
 
 ;;; Code:
 
@@ -65,9 +67,9 @@ If it's not a directory, edit the parent."
 
 ;;;###autoload
 (defun tmsu-query-dired (query &optional flags)
-  "Display the `tmsu' query results as a `dired' buffer.
+  "Display the `tmsu' QUERY results as a `dired' buffer.
 
-Interactively ask for the flags only if \\[universal-argument] got passed."
+Interactively ask for the FLAGS only if \\[universal-argument] got passed."
   (interactive (if (tmsu-database-p)
                    (list (string-join
                           (completing-read-multiple "TMSU query: "
