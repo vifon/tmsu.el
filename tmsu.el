@@ -55,6 +55,9 @@ A sensible example: \"episodes-watched=\""
           (string))
   :safe #'stringp)
 
+(defvar tmsu-edit-history nil
+  "Command history of TMSU edits.")
+
 
 (defun tmsu--get-tags (&optional file)
   (split-string-shell-command
@@ -131,7 +134,8 @@ A sensible example: \"episodes-watched=\""
                                              (tmsu--completion tmsu--key-value-regex
                                                                tags-all)
                                              nil nil
-                                             (string-join tags-old ",")))
+                                             (string-join tags-old ",")
+                                             'tmsu-edit-history))
          (tags-added (cl-set-difference tags-new tags-old :test #'string=))
          (tags-removed (cl-set-difference tags-old tags-new :test #'string=)))
     (unless (or tags-added

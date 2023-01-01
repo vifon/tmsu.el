@@ -62,8 +62,9 @@ If it's not a directory, edit the parent."
 (defvar tmsu-dired-ls-switches "-lh --quoting-style=literal")
 (defvar tmsu-dired-ls-subdir-switches "-alh --quoting-style=literal")
 
-(defvar tmsu-dired-query nil
-  "The last `tmsu' query used by \\[tmsu-dired-query].")
+(defvar tmsu-query-history nil
+  "Command history of TMSU queries.")
+
 
 ;;;###autoload
 (defun tmsu-dired-query (dir query &optional flags)
@@ -80,8 +81,9 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
                          (string-join
                           (completing-read-multiple "TMSU query: "
                                                     (tmsu--completion tmsu--comparison-regex)
-                                                    nil nil nil nil
-                                                    tmsu-dired-query)
+                                                    nil nil nil 'tmsu-query-history
+                                                    (when (bound-and-true-p tmsu-query)
+                                                      tmsu-query))
                           " ")
                          (when current-prefix-arg
                            (read-from-minibuffer "Additional `tmsu files' flags: ")))
@@ -110,8 +112,7 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
     (kill-all-local-variables)
     (setq buffer-read-only nil)
     (erase-buffer)
-    (setq tmsu-dired-query query
-          default-directory dir
+    (setq default-directory dir
           command (format "tmsu files%s --path %s -0 %s | xargs -0 ls -d %s"
                           (if flags
                               (concat " " flags)
@@ -127,6 +128,10 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
       (define-key map (kbd "s") #'tmsu-dired-query)
       (define-key map "\C-c\C-k" #'kill-find) ; Should be safe to reuse verbatim.
       (use-local-map map))
+
+    ;; For later buffer-local access.
+    (setq-local tmsu-query query)
+    (setq-local tmsu-flags flags)
 
     (setq-local dired-sort-inhibit t)
     (setq-local revert-buffer-function
