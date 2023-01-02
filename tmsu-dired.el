@@ -132,7 +132,9 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
     (setq-local dired-sort-inhibit t)
     (setq-local revert-buffer-function
                 (lambda (_ignore-auto _noconfirm)
-                  (tmsu-dired-query dir query flags)))
+                  (let ((point (point)))
+                    (tmsu-dired-query dir query flags)
+                    (setq-local tmsu-dired-goto-char point))))
     ;; Set subdir-alist so that Tree Dired will work:
     (if (fboundp 'dired-simple-subdir-alist)
         ;; will work even with nested dired format (dired-nstd.el,v 1.15
@@ -185,7 +187,9 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
               ;; process is dead, we can delete it now.  Otherwise it
               ;; will stay around until M-x `list-processes'.
               (delete-process proc)
-              (force-mode-line-update))))
+              (force-mode-line-update)))
+          (when (bound-and-true-p tmsu-dired-goto-char)
+            (goto-char tmsu-dired-goto-char)))
       (message "tmsu-dired-query %s finished." buf))))
 
 (provide 'tmsu-dired)
