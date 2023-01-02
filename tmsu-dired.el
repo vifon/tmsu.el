@@ -62,6 +62,11 @@ If it's not a directory, edit the parent."
 (defvar tmsu-dired-ls-switches "-lh --quoting-style=literal")
 (defvar tmsu-dired-ls-subdir-switches "-alh --quoting-style=literal")
 
+(defvar-local tmsu-dired-goto nil
+  "A position to move the point to after loading a tmsu-dired buffer.
+
+It can also be a function which is called after finishing a query.")
+
 ;;;###autoload
 (defun tmsu-dired-query (dir query &optional flags)
   "Display the `tmsu' QUERY results as a `dired' buffer.
@@ -136,7 +141,7 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
                 (lambda (_ignore-auto _noconfirm)
                   (let ((point (point)))
                     (tmsu-dired-query dir query flags)
-                    (setq-local tmsu-dired-goto-char point))))
+                    (setq-local tmsu-dired-goto point))))
     ;; Set subdir-alist so that Tree Dired will work:
     (if (fboundp 'dired-simple-subdir-alist)
         ;; will work even with nested dired format (dired-nstd.el,v 1.15
@@ -190,24 +195,32 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
               ;; will stay around until M-x `list-processes'.
               (delete-process proc)
               (force-mode-line-update)))
-          (when (bound-and-true-p tmsu-dired-goto-char)
-            (goto-char tmsu-dired-goto-char)))
+          (when tmsu-dired-goto
+            (if (functionp tmsu-dired-goto)
+                (funcall tmsu-dired-goto)
+              (goto-char tmsu-dired-goto))))
       (message "tmsu-dired-query %s finished." buf))))
 
 
 
 ;;;###autoload
 (defun tmsu-dired-bookmark-open (bookmark)
-  (let ((dir (bookmark-prop-get bookmark 'filename))
+  (let ((dir (bookmark-get-filename bookmark))
+        (position (bookmark-get-position bookmark))
+        (forward-str (bookmark-get-front-context-string bookmark))
+        (behind-str  (bookmark-get-rear-context-string bookmark))
         (query (bookmark-prop-get bookmark 'tmsu-query))
-        (flags (bookmark-prop-get bookmark 'tmsu-flags))
-        (position (bookmark-prop-get bookmark 'position))
-        (front-context (bookmark-prop-get bookmark 'front-context-string)))
+        (flags (bookmark-prop-get bookmark 'tmsu-flags)))
     (tmsu-dired-query dir
                       query
                       flags)
-    (setq-local tmsu-dired-goto-char position)
-    (setq-local tmsu-bookmark-front-context front-context)))
+    (setq-local tmsu-dired-goto
+                (lambda ()
+                  (goto-char position)
+                  (when (and forward-str (search-forward forward-str (point-max) t))
+                    (goto-char (match-beginning 0)))
+                  (when (and behind-str (search-backward behind-str (point-min) t))
+                    (goto-char (match-end 0)))))))
 
 (defun tmsu-dired-bookmark-make-record ()
   (let* ((dir default-directory)
