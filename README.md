@@ -49,5 +49,5 @@ To install `tmsu.el` using `straight.el`, use the following code:
 
 If you prefer to attach your TMSU tags to directories and not single
 files (think: a directory with a set of movies with common tags), use
-`tmsu-dired-edit-dwim` instead of `tmsu-dired-edit`.  See their
+`tmsu-dired-edit-directory` instead of `tmsu-dired-edit`.  See their
 docstrings for the details.

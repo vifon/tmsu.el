@@ -35,22 +35,33 @@
 If PARENT is non-nil, edit the current directory instead of
 the file at point."
   (interactive "P")
-  (let ((file (if parent
-                  (dired-current-directory)
-                (dired-get-filename t t))))
-    (if file
-        (tmsu-edit file)
+  (let ((file-at-point (dired-get-filename t t)))
+    (if file-at-point
+        (let ((file-to-edit
+               (if parent
+                   (dired-current-directory)
+                 file-at-point)))
+          (tmsu-edit file-to-edit))
       (user-error "No file on this line"))))
 
 ;;;###autoload
-(defun tmsu-dired-edit-dwim ()
-  "Edit the current file's tags.
+(defun tmsu-dired-edit-directory (force-edit-file)
+  "Edit the tags of a directory at point.
 
-If it's not a directory, edit the parent."
-  (interactive)
-  (let* ((file (dired-get-filename t t))
-         (is-directory (and file (file-directory-p file))))
-    (tmsu-dired-edit (not is-directory))))
+If the file at point isn't a directory, operate on the
+parent instead.
+
+\\[universal-argument] sets FORCE-EDIT-FILE to t and allows
+editing a regular file's tags."
+  (interactive "P")
+  (let ((file-at-point (dired-get-filename t t)))
+    (if file-at-point
+        (let ((file-to-edit (if (or (file-directory-p file-at-point)
+                                    force-edit-file)
+                                file-at-point
+                              (dired-current-directory))))
+          (tmsu-edit file-to-edit))
+      (user-error "No file on this line"))))
 
 
 ;; This section is strongly inspired by find-dired.el (included in GNU

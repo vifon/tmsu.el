@@ -152,7 +152,10 @@ TMSU commands."
                                (or (string< a b)
                                    (string-prefix-p tmsu-priority-tag b))))
                      (tmsu--get-tags file)))
-         (tags-new (completing-read-multiple "Tags: "
+         (tags-new (completing-read-multiple (concat "Tag `"
+                                                     (file-name-nondirectory
+                                                      (directory-file-name file))
+                                                     "': ")
                                              (tmsu--completion tmsu--key-value-regex
                                                                tags-all)
                                              nil nil
