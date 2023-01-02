@@ -103,7 +103,10 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
 
   (let ((dired-buffers dired-buffers)
         command)
-    (pop-to-buffer-same-window (get-buffer-create "*tmsu*"))
+    (pop-to-buffer-same-window (get-buffer-create
+                                (concat "tmsu-query: "
+                                        (file-name-nondirectory
+                                         (directory-file-name dir)))))
 
     ;; See if there's still a `tmsu' running, and offer to kill it
     ;; first, if it is.
