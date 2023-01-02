@@ -17,6 +17,21 @@ create a `dired` buffer with the TMSU query results.  Both utilize the
 Emacs `completing-read-multiple` interface and so greatly benefit from
 packages such as `vertico`.
 
+### Persistent queries
+
+The queries can be stored for later recall either with the
+[native Emacs bookmarks][1] or with `org-mode` links using
+[org-store-link][2].
+
+[1]: https://www.gnu.org/software/emacs/manual/html_node/emacs/Bookmarks.html
+[2]: https://orgmode.org/manual/Handling-Links.html
+
+The first type is supported out of the box.  The second one needs to be loaded:
+
+```elisp
+(require 'ol-tmsu)
+```
+
 INSTALLATION
 ------------
 
