@@ -63,6 +63,7 @@ A sensible example: \"episodes-watched=\""
 
 
 (defun tmsu--get-tags (&optional file)
+  "Fetch the TMSU tags of FILE or all tags in the database."
   (split-string-shell-command
    (string-trim-right
     (with-output-to-string
@@ -74,6 +75,7 @@ A sensible example: \"episodes-watched=\""
         (error "Error when running TMSU"))))))
 
 (defun tmsu--get-values (&optional tag)
+  "Fetch the TMSU values of TAG of all values in the database."
   (split-string-shell-command
    (string-trim-right
     (with-output-to-string
@@ -88,7 +90,10 @@ A sensible example: \"episodes-watched=\""
   (rx bos
       (group (+? any))
       (group "=")
-      (group (* any))))
+      (group (* any)))
+  "A regex matching an assignment of a TMSU tag value.
+
+Example: year=2000")
 
 (defconst tmsu--comparison-regex
   (rx bos
@@ -98,9 +103,20 @@ A sensible example: \"episodes-watched=\""
                  ">="
                  (any "<=>"))
              (* space))
-      (group (* any))))
+      (group (* any)))
+  "A regular expression matching a TMSU comparison expression.
+
+Example: year < 2000")
 
 (defun tmsu--completion (regex &optional tags)
+  "Generate a completion function for `completing-read'.
+
+REGEX determines what expressions should offer a tag value as
+a completion.  Usually either `tmsu--key-value-regex' or
+`tmsu--comparison-regex'.
+
+TAGS can be provided as a pre-computed list of all tags to
+complete.  If nil, calls `tmsu--get-tags' instead."
   (setq tags (or tags (tmsu--get-tags)))
   (completion-table-dynamic
    (lambda (string)
@@ -117,7 +133,10 @@ A sensible example: \"episodes-watched=\""
        candidates))))
 
 (defun tmsu-database-p ()
-  "Check whether a TMSU database exists for the current directory."
+  "Check whether a TMSU database exists for the current directory.
+
+Should be called near the beginning of all the user-facing
+TMSU commands."
   (= (call-process "tmsu" nil nil nil "info") 0))
 
 ;;;###autoload

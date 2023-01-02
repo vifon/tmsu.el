@@ -1,4 +1,4 @@
-;;; ol-tmsu.el --- org-mode links to TMSU queries    -*- lexical-binding: t; -*-
+;;; ol-tmsu.el --- Org-mode links to TMSU queries    -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2023  Wojciech Siewierski
 
@@ -34,9 +34,11 @@
       (group (*? any))
       (? "::"
          (group (* any)))
-      eol))
+      eol)
+  "A regex matching an `org-mode' link this module generates.")
 
 (defun org-tmsu-open-link (link &optional arg)
+  "Implement the :follow handler for `org-store-link'."
   (require 'tmsu-dired)
   (string-match org-tmsu-link-regex link)
   (tmsu-dired-query (match-string 1 link)
@@ -44,6 +46,7 @@
                     (match-string 3 link)))
 
 (defun org-tmsu-store-link ()
+  "Implement the :store handler for `org-store-link'."
   (when (and (eq major-mode 'dired-mode)
              (bound-and-true-p tmsu-query))
     (let* ((dir default-directory)
