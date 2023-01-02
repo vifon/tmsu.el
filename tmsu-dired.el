@@ -109,7 +109,7 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
     (setq buffer-read-only nil)
     (erase-buffer)
     (setq default-directory dir
-          command (format "tmsu files%s --path %s -0 %s | xargs -0 ls -d %s"
+          command (format "tmsu files%s --path %s -0 -- %s | xargs -0 ls -d %s"
                           (if flags
                               (concat " " flags)
                             "")

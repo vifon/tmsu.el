@@ -67,7 +67,7 @@ A sensible example: \"episodes-watched=\""
    (string-trim-right
     (with-output-to-string
       (unless (= (apply #'call-process "tmsu" nil standard-output nil
-                        "tags" "--name=never" "--explicit"
+                        "tags" "--name=never" "--explicit" "--"
                         (when file
                           (list file)))
                  0)
@@ -80,7 +80,7 @@ A sensible example: \"episodes-watched=\""
       (unless (= (apply #'call-process "tmsu" nil standard-output nil
                         "values"
                         (when tag
-                          (list tag)))
+                          (list "--" tag)))
                  0)
         (error "No such tag"))))))
 
@@ -146,11 +146,11 @@ A sensible example: \"episodes-watched=\""
       (user-error "No changes"))
     (apply #'call-process
            "tmsu" nil nil nil
-           "untag" file
+           "untag" "--" file
            tags-removed)
     (apply #'call-process
            "tmsu" nil nil nil
-           "tag" "--explicit" file
+           "tag" "--explicit" "--" file
            tags-added)
     (message "%S: %s"
              (tmsu--get-tags file)
