@@ -166,8 +166,7 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
     (let ((proc (get-buffer-process (current-buffer))))
       ;; `find-dired-filter' should do with no changes at all.
       (set-process-filter proc #'find-dired-filter)
-      ;; `find-dired-filter' needed minor changes (mostly messages),
-      ;; so there we go.
+      ;; `find-dired-sentinel' needed minor changes, so there we go.
       (set-process-sentinel proc #'tmsu-dired-sentinel)
       ;; Initialize the process marker; it is used by the filter.
       (move-marker (process-mark proc) (point) (current-buffer)))
