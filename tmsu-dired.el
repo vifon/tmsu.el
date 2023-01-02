@@ -174,7 +174,9 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
     (setq mode-line-process '(":%s"))))
 
 (defun tmsu-dired-sentinel (proc state)
-  "Sentinel for \\[tmsu-dired-query] processes."
+  "Sentinel for \\[tmsu-dired-query] processes.
+
+Enforces `tmsu-dired-goto'."
   (let ((buf (process-buffer proc)))
     (if (buffer-name buf)
         (with-current-buffer buf
@@ -205,6 +207,8 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
 
 ;;;###autoload
 (defun tmsu-dired-bookmark-open (bookmark)
+  "Implements the handler function for bookmarks created with
+`tmsu-dired-bookmark-make-record'."
   (let ((dir (bookmark-get-filename bookmark))
         (position (bookmark-get-position bookmark))
         (forward-str (bookmark-get-front-context-string bookmark))
@@ -223,6 +227,8 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
                     (goto-char (match-end 0)))))))
 
 (defun tmsu-dired-bookmark-make-record ()
+  "Implements `bookmark-make-record-function' for the
+`tmsu-dired-query' buffers."
   (let* ((dir default-directory)
          (query tmsu-query)
          (flags tmsu-flags)
