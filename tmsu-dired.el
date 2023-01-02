@@ -129,6 +129,8 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
     (setq-local tmsu-query query)
     (setq-local tmsu-flags flags)
 
+    (setq-local bookmark-make-record-function #'tmsu-dired-bookmark-make-record)
+
     (setq-local dired-sort-inhibit t)
     (setq-local revert-buffer-function
                 (lambda (_ignore-auto _noconfirm)
@@ -191,6 +193,38 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
           (when (bound-and-true-p tmsu-dired-goto-char)
             (goto-char tmsu-dired-goto-char)))
       (message "tmsu-dired-query %s finished." buf))))
+
+
+
+;;;###autoload
+(defun tmsu-dired-bookmark-open (bookmark)
+  (let ((dir (bookmark-prop-get bookmark 'filename))
+        (query (bookmark-prop-get bookmark 'tmsu-query))
+        (flags (bookmark-prop-get bookmark 'tmsu-flags))
+        (position (bookmark-prop-get bookmark 'position))
+        (front-context (bookmark-prop-get bookmark 'front-context-string)))
+    (tmsu-dired-query dir
+                      query
+                      flags)
+    (setq-local tmsu-dired-goto-char position)
+    (setq-local tmsu-bookmark-front-context front-context)))
+
+(defun tmsu-dired-bookmark-make-record ()
+  (let* ((dir default-directory)
+         (query tmsu-query)
+         (flags tmsu-flags)
+         (desc (concat "tmsu:"
+                       query
+                       " @ "
+                       (file-name-nondirectory
+                        (directory-file-name
+                         default-directory)))))
+    `(,desc
+      ,@(bookmark-make-record-default 'no-file)
+      (handler . tmsu-dired-bookmark-open)
+      (filename . ,dir)
+      (tmsu-query . ,query)
+      (tmsu-flags . ,flags))))
 
 (provide 'tmsu-dired)
 ;;; tmsu-dired.el ends here
