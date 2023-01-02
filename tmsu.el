@@ -58,6 +58,9 @@ A sensible example: \"episodes-watched=\""
 (defvar tmsu-edit-history nil
   "Command history of TMSU edits.")
 
+(defvar tmsu-query-history nil
+  "Command history of TMSU queries.")
+
 
 (defun tmsu--get-tags (&optional file)
   (split-string-shell-command

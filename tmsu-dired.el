@@ -62,10 +62,6 @@ If it's not a directory, edit the parent."
 (defvar tmsu-dired-ls-switches "-lh --quoting-style=literal")
 (defvar tmsu-dired-ls-subdir-switches "-alh --quoting-style=literal")
 
-(defvar tmsu-query-history nil
-  "Command history of TMSU queries.")
-
-
 ;;;###autoload
 (defun tmsu-dired-query (dir query &optional flags)
   "Display the `tmsu' QUERY results as a `dired' buffer.
