@@ -101,7 +101,6 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
                  (error "No TMSU database")))
 
   (let ((dired-buffers dired-buffers)
-        (query-string (string-join query " "))
         command)
     (pop-to-buffer-same-window (get-buffer-create
                                 (concat "tmsu-query: "
@@ -133,7 +132,7 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
                               (concat " " flags)
                             "")
                           (shell-quote-argument dir)
-                          (shell-quote-argument query-string)
+                          (mapconcat #'shell-quote-argument query " ")
                           tmsu-dired-ls-switches))
 
     (shell-command (concat command "&") (current-buffer))
