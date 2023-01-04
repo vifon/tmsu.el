@@ -28,6 +28,9 @@
 
 (require 'ol)
 
+(eval-when-compile
+  (require 'subr-x))
+
 (defconst org-tmsu-link-regex
   (rx (group (*? any))
       "::"
@@ -41,16 +44,17 @@
   "Implement the :follow handler for `org-store-link'."
   (require 'tmsu-dired)
   (string-match org-tmsu-link-regex link)
-  (tmsu-dired-query (match-string 1 link)
-                    (match-string 2 link)
-                    (match-string 3 link)))
+  (let ((dir   (match-string 1 link))
+        (query (match-string 2 link))
+        (flags (match-string 3 link)))
+    (tmsu-dired-query dir (split-string query ",") flags)))
 
 (defun org-tmsu-store-link ()
   "Implement the :store handler for `org-store-link'."
   (when (and (eq major-mode 'dired-mode)
              (bound-and-true-p tmsu-query))
     (let* ((dir default-directory)
-           (query tmsu-query)
+           (query (string-join tmsu-query ","))
            (flags tmsu-flags)
            (link (if flags
                      (concat "tmsu:" dir "::" query "::" flags)

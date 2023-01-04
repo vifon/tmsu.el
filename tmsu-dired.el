@@ -91,18 +91,17 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
                    (list (if (eq major-mode 'dired-mode)
                              (dired-current-directory)
                            default-directory)
-                         (string-join
-                          (completing-read-multiple "TMSU query: "
-                                                    (tmsu--completion tmsu--comparison-regex)
-                                                    nil nil nil 'tmsu-query-history
-                                                    (when (bound-and-true-p tmsu-query)
-                                                      tmsu-query))
-                          " ")
+                         (completing-read-multiple "TMSU query: "
+                                                   (tmsu--completion tmsu--comparison-regex)
+                                                   nil nil nil 'tmsu-query-history
+                                                   (when (bound-and-true-p tmsu-query)
+                                                     (string-join tmsu-query ",")))
                          (when current-prefix-arg
                            (read-from-minibuffer "Additional `tmsu files' flags: ")))
                  (error "No TMSU database")))
 
   (let ((dired-buffers dired-buffers)
+        (query-string (string-join query " "))
         command)
     (pop-to-buffer-same-window (get-buffer-create
                                 (concat "tmsu-query: "
@@ -134,7 +133,7 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
                               (concat " " flags)
                             "")
                           (shell-quote-argument dir)
-                          (shell-quote-argument query)
+                          (shell-quote-argument query-string)
                           tmsu-dired-ls-switches))
 
     (shell-command (concat command "&") (current-buffer))
@@ -247,7 +246,7 @@ Enforces `tmsu-dired-goto'."
          (query tmsu-query)
          (flags tmsu-flags)
          (desc (concat "tmsu:"
-                       query
+                       (string-join query ",")
                        " @ "
                        (file-name-nondirectory
                         (directory-file-name
