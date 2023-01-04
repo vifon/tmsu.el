@@ -161,7 +161,7 @@ TMSU commands."
                                              nil nil
                                              (string-join tags-old ",")
                                              'tmsu-edit-history))
-         (tags-added (cl-set-difference tags-new tags-old :test #'string=))
+         (tags-added   (cl-set-difference tags-new tags-old :test #'string=))
          (tags-removed (cl-set-difference tags-old tags-new :test #'string=)))
     (unless (or tags-added
                 tags-removed)

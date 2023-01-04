@@ -74,9 +74,10 @@ editing a regular file's tags."
 (defvar tmsu-dired-ls-subdir-switches "-alh --quoting-style=literal")
 
 (defvar-local tmsu-dired-goto nil
-  "A position to move the point to after loading a tmsu-dired buffer.
+  "A position to move the point to after loading a `tmsu-dired-query' buffer.
 
-It can also be a function which is called after finishing a query.")
+It can also be a function which is called after finishing
+a query.")
 
 ;;;###autoload
 (defun tmsu-dired-query (dir query &optional flags)
@@ -236,7 +237,7 @@ Enforces `tmsu-dired-goto'."
                   (goto-char position)
                   (when (and forward-str (search-forward forward-str (point-max) t))
                     (goto-char (match-beginning 0)))
-                  (when (and behind-str (search-backward behind-str (point-min) t))
+                  (when (and behind-str  (search-backward behind-str (point-min) t))
                     (goto-char (match-end 0)))))))
 
 (defun tmsu-dired-bookmark-make-record ()
