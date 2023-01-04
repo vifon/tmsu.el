@@ -239,18 +239,36 @@ Enforces `tmsu-dired-goto'."
                   (when (and behind-str  (search-backward behind-str (point-min) t))
                     (goto-char (match-end 0)))))))
 
+(defcustom tmsu-dired-pretty-description-function
+  #'tmsu-dired-pretty-description
+  "A function used to generate pretty-printed buffer names for
+`tmsu-dired-query'.
+
+Used for the bookmark and link default name generation."
+  :type 'function)
+
+(defun tmsu-dired-pretty-description (&optional dir query flags)
+  "The default implementation of `tmsu-dired-pretty-description-function'.
+
+If any of the DIR, QUERY and FLAGS arguments are nil, the
+respective value is being inferred from the current buffer."
+  (setq dir   (or dir   default-directory)
+        query (or query tmsu-query)
+        flags (or flags tmsu-flags))
+  (concat "tmsu:"
+          (string-join query " and ")
+          " @ "
+          (file-name-nondirectory
+           (directory-file-name
+            dir))))
+
 (defun tmsu-dired-bookmark-make-record ()
   "Implements `bookmark-make-record-function' for the
 `tmsu-dired-query' buffers."
   (let* ((dir default-directory)
          (query tmsu-query)
          (flags tmsu-flags)
-         (desc (concat "tmsu:"
-                       (string-join query ",")
-                       " @ "
-                       (file-name-nondirectory
-                        (directory-file-name
-                         default-directory)))))
+         (desc (funcall tmsu-dired-pretty-description-function)))
     `(,desc
       ,@(bookmark-make-record-default 'no-file)
       (handler . tmsu-dired-bookmark-open)

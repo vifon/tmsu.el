@@ -59,12 +59,7 @@
            (link (if flags
                      (concat "tmsu:" dir "::" query "::" flags)
                    (concat "tmsu:" dir "::" query)))
-           (desc (concat "tmsu:"
-                         query
-                         " @ "
-                         (file-name-nondirectory
-                          (directory-file-name
-                           default-directory)))))
+           (desc (funcall tmsu-dired-pretty-description-function)))
       (org-link-store-props :type "tmsu"
                             :link link
                             :description desc
