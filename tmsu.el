@@ -145,17 +145,16 @@ TMSU commands."
   (interactive "f")
   (unless (tmsu-database-p)
     (error "No TMSU database"))
-  (let* ((tags-all (tmsu--get-tags))
+  (let* ((file-name (file-name-nondirectory
+                     (directory-file-name file)))
+         (tags-all (tmsu--get-tags))
          (tags-old (if tmsu-priority-tag
                        (sort (tmsu--get-tags file)
                              (lambda (a b)
                                (or (string< a b)
                                    (string-prefix-p tmsu-priority-tag b))))
                      (tmsu--get-tags file)))
-         (tags-new (completing-read-multiple (concat "Tag `"
-                                                     (file-name-nondirectory
-                                                      (directory-file-name file))
-                                                     "': ")
+         (tags-new (completing-read-multiple (format-message "Tag `%s': " file-name)
                                              (tmsu--completion tmsu--key-value-regex
                                                                tags-all)
                                              nil nil
@@ -174,7 +173,8 @@ TMSU commands."
            "tmsu" nil nil nil
            "tag" "--explicit" "--" file
            tags-added)
-    (message "%S: %s"
+    (message "TMSU tags change on `%s': %S: %s"
+             file-name
              (tmsu--get-tags file)
              (mapconcat #'identity
                         (nconc (mapcar (lambda (tag)
