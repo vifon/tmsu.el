@@ -79,6 +79,23 @@ editing a regular file's tags."
 It can also be a function which is called after finishing
 a query.")
 
+(defcustom tmsu-dired-buffer-name-function
+  #'tmsu-dired-buffer-name
+  "A function used to generate `tmsu-dired-query' buffer names.
+
+Customize to change the buffer naming convention."
+  :type 'function)
+
+(defun tmsu-dired-buffer-name (dir query flags)
+  "The default implementation of `tmsu-dired-buffer-name-function'."
+  (let ((query-pp (string-join query " and "))
+        (dir-name (file-name-nondirectory
+                   (directory-file-name
+                    dir))))
+    (format "tmsu-query: %s @ %s"
+            query-pp
+            dir-name)))
+
 ;;;###autoload
 (defun tmsu-dired-query (dir query &optional flags)
   "Display the `tmsu' QUERY results as a `dired' buffer.
@@ -103,9 +120,8 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
   (let ((dired-buffers dired-buffers)
         command)
     (pop-to-buffer-same-window (get-buffer-create
-                                (concat "tmsu-query: "
-                                        (file-name-nondirectory
-                                         (directory-file-name dir)))))
+                                (funcall tmsu-dired-buffer-name-function
+                                         dir query flags)))
 
     ;; See if there's still a `tmsu' running, and offer to kill it
     ;; first, if it is.
