@@ -139,6 +139,20 @@ Should be called near the beginning of all the user-facing
 TMSU commands."
   (= (call-process "tmsu" nil nil nil "info") 0))
 
+(defun tmsu-tags-add (file &rest tags)
+  "Add TAGS to FILE."
+  (apply #'call-process
+         "tmsu" nil nil nil
+         "tag" "--explicit" "--" file
+         tags))
+
+(defun tmsu-tags-remove (file &rest tags)
+  "Remove TAGS from FILE."
+  (apply #'call-process
+         "tmsu" nil nil nil
+         "untag" "--" file
+         tags))
+
 ;;;###autoload
 (defun tmsu-edit (file)
   "Interactively edit the TMSU tags of FILE."
@@ -165,14 +179,8 @@ TMSU commands."
     (unless (or tags-added
                 tags-removed)
       (user-error "No changes"))
-    (apply #'call-process
-           "tmsu" nil nil nil
-           "untag" "--" file
-           tags-removed)
-    (apply #'call-process
-           "tmsu" nil nil nil
-           "tag" "--explicit" "--" file
-           tags-added)
+    (apply #'tmsu-tags-remove file tags-removed)
+    (apply #'tmsu-tags-add    file tags-added)
     (message "TMSU tags change on `%s': %S: %s"
              file-name
              (tmsu--get-tags file)
