@@ -80,7 +80,10 @@ a query.")
   "A function used to generate `tmsu-dired-query' buffer names.
 
 Customize to change the buffer naming convention."
-  :type 'function)
+  :type '(choice
+          (const :tag "Directory name + query" tmsu-dired-buffer-name)
+          (const :tag "Directory name" tmsu-dired-buffer-name-simple)
+          (function :tag "Custom")))
 
 (defun tmsu-dired-buffer-name (dir query flags)
   "The default implementation of `tmsu-dired-buffer-name-function'."
@@ -91,6 +94,13 @@ Customize to change the buffer naming convention."
     (format "tmsu-query: %s @ %s"
             query-pp
             dir-name)))
+
+(defun tmsu-dired-buffer-name-simple (dir query flags)
+  "An alternative implementation of `tmsu-dired-buffer-name-function'."
+  (let ((dir-name (file-name-nondirectory
+                   (directory-file-name
+                    dir))))
+    (concat "tmsu-query: " dir-name)))
 
 ;;;###autoload
 (defun tmsu-dired-query (dir query &optional flags)
