@@ -106,26 +106,43 @@ Customize to change the buffer naming convention."
     (concat "tmsu-query: " dir-name)))
 
 ;;;###autoload
-(defun tmsu-dired-query (dir query &optional flags)
+(defun tmsu-dired-query (&optional dir query flags)
   "Display the `tmsu' QUERY results as a `dired' buffer.
 
 The query is anchored at DIR as the working directory.
 Interactively it's always the current directory.
 
 Interactively ask for the FLAGS only if \\[universal-argument] got passed."
-  (interactive (if (tmsu-database-p)
-                   (list (if (eq major-mode 'dired-mode)
-                             (dired-current-directory)
-                           default-directory)
-                         (completing-read-multiple "TMSU query: "
-                                                   (tmsu--completion tmsu--comparison-regex)
-                                                   nil nil nil 'tmsu-query-history
-                                                   (when (bound-and-true-p tmsu-query)
-                                                     (string-join tmsu-query ",")))
-                         (when current-prefix-arg
-                           (read-from-minibuffer "Additional `tmsu files' flags: ")))
-                 (error "No TMSU database")))
+  (interactive)
 
+  ;; Either change the directory to the provided one, or accept the
+  ;; current one as the argument.
+  (if dir
+      (setq default-directory dir)
+    (setq dir (if (eq major-mode 'dired-mode)
+                  (dired-current-directory)
+                default-directory)))
+
+  ;; Now that we're in the correct directory, make sure the DB is present.
+  (unless (tmsu-database-p)
+    (error "No TMSU database"))
+
+  (unless query
+    (setq query (completing-read-multiple "TMSU query: "
+                                          (tmsu--completion tmsu--comparison-regex)
+                                          nil nil nil 'tmsu-query-history
+                                          (when (bound-and-true-p tmsu-query)
+                                            (string-join tmsu-query ",")))))
+
+  (when (and (not flags)
+             current-prefix-arg)
+    (setq flags (read-from-minibuffer "Additional `tmsu files' flags: ")))
+
+  ;; Done preparing the interactive arguments!
+
+  ;; Do not modify the global value of `dired-buffers'.
+  ;; Otherwise `dired' might reuse the tmsu-query buffers when
+  ;; creating a fresh one would be more appropriate.
   (let ((dired-buffers dired-buffers)
         command)
     (pop-to-buffer-same-window (get-buffer-create
@@ -151,8 +168,7 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
     (kill-all-local-variables)
     (setq buffer-read-only nil)
     (erase-buffer)
-    (setq default-directory dir
-          command (format "tmsu files%s --path %s -0 -- %s | xargs -0 ls -d %s"
+    (setq command (format "tmsu files%s --path %s -0 -- %s | xargs -0 ls -d %s"
                           (if flags
                               (concat " " flags)
                             "")
