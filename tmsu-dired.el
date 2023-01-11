@@ -81,7 +81,7 @@ a query.")
 
 Customize to change the buffer naming convention."
   :type '(choice
-          (const :tag "Directory name + query" tmsu-dired-buffer-name)
+          (const :tag "Directory name with query and optional flags" tmsu-dired-buffer-name)
           (const :tag "Directory name" tmsu-dired-buffer-name-simple)
           (function :tag "Custom")))
 
@@ -91,9 +91,12 @@ Customize to change the buffer naming convention."
         (dir-name (file-name-nondirectory
                    (directory-file-name
                     dir))))
-    (format "tmsu-query: %s @ %s"
+    (format "tmsu-query: %s @ %s%s"
             query-pp
-            dir-name)))
+            dir-name
+            (if flags
+                (concat " (" flags ")")
+              ""))))
 
 (defun tmsu-dired-buffer-name-simple (dir query flags)
   "An alternative implementation of `tmsu-dired-buffer-name-function'."
