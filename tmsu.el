@@ -62,7 +62,7 @@ A sensible example: \"episodes-watched=\""
   "Command history of TMSU queries.")
 
 
-(defun tmsu--get-tags (&optional file)
+(defun tmsu-get-tags (&optional file)
   "Fetch the TMSU tags of FILE or all tags in the database."
   (split-string-shell-command
    (string-trim-right
@@ -74,7 +74,7 @@ A sensible example: \"episodes-watched=\""
                  0)
         (error "Error when running TMSU"))))))
 
-(defun tmsu--get-values (&optional tag)
+(defun tmsu-get-values (&optional tag)
   "Fetch the TMSU values of TAG of all values in the database."
   (split-string-shell-command
    (string-trim-right
@@ -116,8 +116,8 @@ a completion.  Usually either `tmsu--key-value-regex' or
 `tmsu--comparison-regex'.
 
 TAGS can be provided as a pre-computed list of all tags to
-complete.  If nil, calls `tmsu--get-tags' instead."
-  (setq tags (or tags (tmsu--get-tags)))
+complete.  If nil, calls `tmsu-get-tags' instead."
+  (setq tags (or tags (tmsu-get-tags)))
   (completion-table-dynamic
    (lambda (string)
      (string-match regex string)
@@ -128,7 +128,7 @@ complete.  If nil, calls `tmsu--get-tags' instead."
                             (mapcar
                              (lambda (value)
                                (concat key op value))
-                             (tmsu--get-values key))
+                             (tmsu-get-values key))
                           tags)))
        candidates))))
 
@@ -161,13 +161,13 @@ TMSU commands."
     (error "No TMSU database"))
   (let* ((file-name (file-name-nondirectory
                      (directory-file-name file)))
-         (tags-all (tmsu--get-tags))
+         (tags-all (tmsu-get-tags))
          (tags-old (if tmsu-priority-tag
-                       (sort (tmsu--get-tags file)
+                       (sort (tmsu-get-tags file)
                              (lambda (a b)
                                (or (string< a b)
                                    (string-prefix-p tmsu-priority-tag b))))
-                     (tmsu--get-tags file)))
+                     (tmsu-get-tags file)))
          (tags-new (completing-read-multiple (format-message "Tag `%s': " file-name)
                                              (tmsu--completion tmsu--key-value-regex
                                                                tags-all)
@@ -183,7 +183,7 @@ TMSU commands."
     (apply #'tmsu-tags-add    file tags-added)
     (message "TMSU tags change on `%s': %S: %s"
              file-name
-             (tmsu--get-tags file)
+             (tmsu-get-tags file)
              (mapconcat #'identity
                         (nconc (mapcar (lambda (tag)
                                          (concat "-"
