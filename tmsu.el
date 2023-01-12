@@ -115,6 +115,13 @@ Example input: year=2000")
       eos)
   "A regular expression matching a TMSU comparison expression.
 
+Matches both a single expression and compound expressions (`not',
+`and', `or'), treating everything before the current argument as
+a prefix (a single large match group).
+
+No support for parentheses is currently planned, but that only
+affects the completion: they can still be used by hand.
+
 Example input: not year < 2000")
 
 (defun tmsu--completion (regex &optional tags)
