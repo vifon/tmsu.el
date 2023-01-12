@@ -119,11 +119,14 @@ The result *should not* be stored back as the internal
 representation of the query, to avoid applying it multiple times
 when recreating the query buffer from this
 internal representation."
-  (mapcar (lambda (expr)
-            (if (string-match-p (rx space (| "or" "and") space) expr)
-                (concat "(" expr ")")
-              expr))
-          query))
+  (if (cdr query)
+      (mapcar (lambda (expr)
+                (if (string-match-p (rx space (| "or" "and") space) expr)
+                    (concat "(" expr ")")
+                  expr))
+              query)
+    ;; Single element queries are trivial, no need to do anything.
+    query))
 
 ;;;###autoload
 (defun tmsu-dired-query (&optional dir query flags)
