@@ -88,25 +88,27 @@ A sensible example: \"episodes-watched=\""
 
 (defconst tmsu--key-value-regex
   (rx bos
-      (group (+? any))
-      (group "=")
-      (group (* any)))
+      (group-n 2 (+? any))
+      (group-n 3 "=")
+      (group-n 4 (* any)))
   "A regex matching an assignment of a TMSU tag value.
 
-Example: year=2000")
+Example input: year=2000")
 
 (defconst tmsu--comparison-regex
   (rx bos
-      (group (+? any))
-      (group (* space)
-             (or "<="
-                 ">="
-                 (any "<=>"))
-             (* space))
-      (group (* any)))
+      (group (? "not" (+ space)))
+      (group (*? any))
+      (? (group (* space)
+                (or "<="
+                    ">="
+                    (any "<=>"))
+                (* space))
+         (group (* any)))
+      eos)
   "A regular expression matching a TMSU comparison expression.
 
-Example: year < 2000")
+Example input: not year < 2000")
 
 (defun tmsu--completion (regex &optional tags)
   "Generate a completion function for `completing-read'.
@@ -120,17 +122,16 @@ complete.  If nil, calls `tmsu-get-tags' instead."
   (setq tags (or tags (tmsu-get-tags)))
   (completion-table-dynamic
    (lambda (string)
-     (string-match regex string)
-     (let* ((key (match-string 1 string))
-            (op (match-string 2 string))
-            ;; (value (match-string 3 string))
-            (candidates (if key
-                            (mapcar
-                             (lambda (value)
-                               (concat key op value))
-                             (tmsu-get-values key))
-                          tags)))
-       candidates))))
+     (if (string-match regex string)
+         (let ((prefix (match-string 1 string))
+               (key (match-string 2 string))
+               (infix (match-string 3 string)))
+           (if infix
+               (mapcar (lambda (value) (concat prefix key infix value))
+                       (tmsu-get-values key))
+             (mapcar (lambda (tag) (concat prefix tag))
+                     tags)))
+       tags))))
 
 (defun tmsu-database-p ()
   "Check whether a TMSU database exists for the current directory.
