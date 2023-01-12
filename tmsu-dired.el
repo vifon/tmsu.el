@@ -149,7 +149,7 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
 
   (unless query
     (setq query (completing-read-multiple "TMSU query: "
-                                          (tmsu--completion tmsu--comparison-regex)
+                                          (tmsu--completion tmsu--expression-regex)
                                           nil nil nil 'tmsu-query-history
                                           (when (bound-and-true-p tmsu-query)
                                             (string-join tmsu-query ",")))))

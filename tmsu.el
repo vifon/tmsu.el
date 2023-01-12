@@ -95,7 +95,7 @@ A sensible example: \"episodes-watched=\""
 
 Example input: year=2000")
 
-(defconst tmsu--comparison-regex
+(defconst tmsu--expression-regex
   (rx bos
       (group (? (? "not")
                 (? (* any)
@@ -129,7 +129,7 @@ Example input: not year < 2000")
 
 REGEX determines what expressions should offer a tag value as
 a completion.  Usually either `tmsu--key-value-regex' or
-`tmsu--comparison-regex'.
+`tmsu--expression-regex'.
 
 TAGS can be provided as a pre-computed list of all tags to
 complete.  If nil, calls `tmsu-get-tags' instead."
