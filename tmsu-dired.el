@@ -111,16 +111,16 @@ Customize to change the buffer naming convention."
 
 The list representation of the query might need some steps for it
 to have the expected semantics when combined into a single query.
-One such case is wrapping the `or' expressions in parentheses as
-the implicit `and' between each query list element should have
-a lower priority.
+One such case is wrapping the expressions containing the infix
+operators in parentheses as the implicit `and' between each query
+list element should have a lower priority.
 
 The result *should not* be stored back as the internal
 representation of the query, to avoid applying it multiple times
 when recreating the query buffer from this
 internal representation."
   (mapcar (lambda (expr)
-            (if (string-match-p (rx space "or" space) expr)
+            (if (string-match-p (rx space (| "or" "and") space) expr)
                 (concat "(" expr ")")
               expr))
           query))

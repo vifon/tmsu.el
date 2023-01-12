@@ -97,10 +97,13 @@ Example input: year=2000")
 
 (defconst tmsu--comparison-regex
   (rx bos
-      (group (? (or "not"
-                    (and (* any)
-                         space
-                         "or"))
+      (group (? (? "not")
+                (? (* any)
+                   space
+                   (or "or"
+                       "and")
+                   (? (+ space)
+                      "not"))
                 (+ space)))
       (group (*? any))
       (? (group (* space)
