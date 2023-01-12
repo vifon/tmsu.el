@@ -84,7 +84,7 @@ A sensible example: \"episodes-watched=\""
                         (when tag
                           (list "--" tag)))
                  0)
-        (error "No such tag"))))))
+        (error "No such tag: %s" tag))))))
 
 (defconst tmsu--key-value-regex
   (rx bos
