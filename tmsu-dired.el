@@ -87,7 +87,8 @@ Customize to change the buffer naming convention."
 
 (defun tmsu-dired-buffer-name (dir query flags)
   "The default implementation of `tmsu-dired-buffer-name-function'."
-  (let ((query-pp (string-join query " and "))
+  (let ((query-pp (string-join (tmsu-dired--preprocess-query query)
+                               " and "))
         (dir-name (file-name-nondirectory
                    (directory-file-name
                     dir))))
@@ -104,6 +105,25 @@ Customize to change the buffer naming convention."
                    (directory-file-name
                     dir))))
     (concat "tmsu-query: " dir-name)))
+
+(defun tmsu-dired--preprocess-query (query)
+  "Preprocess the query to ensure correct semantics.
+
+The list representation of the query might need some steps for it
+to have the expected semantics when combined into a single query.
+One such case is wrapping the `or' expressions in parentheses as
+the implicit `and' between each query list element should have
+a lower priority.
+
+The result *should not* be stored back as the internal
+representation of the query, to avoid applying it multiple times
+when recreating the query buffer from this
+internal representation."
+  (mapcar (lambda (expr)
+            (if (string-match-p (rx space "or" space) expr)
+                (concat "(" expr ")")
+              expr))
+          query))
 
 ;;;###autoload
 (defun tmsu-dired-query (&optional dir query flags)
@@ -173,7 +193,9 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
                               (concat " " flags)
                             "")
                           (shell-quote-argument dir)
-                          (mapconcat #'shell-quote-argument query " ")
+                          (mapconcat #'shell-quote-argument
+                                     (tmsu-dired--preprocess-query query)
+                                     " ")
                           tmsu-dired-ls-switches))
 
     (shell-command (concat command "&") (current-buffer))
@@ -292,8 +314,8 @@ Used for the bookmark and link default name generation."
 
 If any of the DIR, QUERY and FLAGS arguments are nil, the
 respective value is being inferred from the current buffer."
-  (setq dir   (or dir   default-directory)
-        query (or query tmsu-query)
+  (setq dir   (or dir default-directory)
+        query (tmsu-dired--preprocess-query (or query tmsu-query))
         flags (or flags tmsu-flags))
   (concat "tmsu:"
           (string-join query " and ")
