@@ -89,8 +89,8 @@ the list in a specific way."
 (defconst tmsu--key-value-regex
   (rx bos
       (group-n 2 (+? any))
-      (group-n 3 "=")
-      (group-n 4 (* any)))
+      (group "=")
+      (group (* any)))
   "A regex matching an assignment of a TMSU tag value.
 
 Example input: year=2000")
