@@ -46,14 +46,14 @@
   '((t (:inherit diff-removed)))
   "The face used to display the removed tags.")
 
-(defcustom tmsu-priority-tag nil
-  "A tag (actually a prefix) to always sort as the last one for easy editing.
+(defcustom tmsu-tag-list-preprocess-functions nil
+  "A list of functions to apply to the current tags list in the `tmsu-edit' UI.
 
-A sensible example: \"episodes-watched=\""
-  :type '(choice
-          (const :tag "None" nil)
-          (string))
-  :safe #'stringp)
+Each function should accept the tag list as its only argument and
+return the modified tag list which is then passed to the next
+function.  One possible use for this variable would be to sort
+the list in a specific way."
+  :type '(repeat function))
 
 (defvar tmsu-edit-history nil
   "Command history of TMSU edits.")
@@ -177,12 +177,9 @@ TMSU commands."
   (let* ((file-name (file-name-nondirectory
                      (directory-file-name file)))
          (tags-all (tmsu-get-tags))
-         (tags-old (if tmsu-priority-tag
-                       (sort (tmsu-get-tags file)
-                             (lambda (a b)
-                               (or (string< a b)
-                                   (string-prefix-p tmsu-priority-tag b))))
-                     (tmsu-get-tags file)))
+         (tags-old (let ((tags (tmsu-get-tags file)))
+                     (dolist (func tmsu-tag-list-preprocess-functions tags)
+                       (setq tags (funcall func tags)))))
          (tags-new (completing-read-multiple (format-message "Tag `%s': " file-name)
                                              (tmsu--completion tmsu--key-value-regex
                                                                tags-all)
