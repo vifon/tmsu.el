@@ -201,7 +201,15 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
                                      " ")
                           tmsu-dired-ls-switches))
 
-    (shell-command (concat command "&") (current-buffer))
+    (make-process :name "tmsu-query"
+                  :command `("sh" "-c" ,command)
+                  :buffer (current-buffer)
+                  ;; `find-dired-filter' should do with no changes at all.
+                  :filter #'find-dired-filter
+                  ;; `find-dired-sentinel' needed minor changes, so there we go.
+                  :sentinel #'tmsu-dired-sentinel
+                  ;; Handle the remote (TRAMP) directories.
+                  :file-handler t)
     (dired-mode dir tmsu-dired-ls-switches)
     (let ((map (make-sparse-keymap)))
       (set-keymap-parent map (current-local-map))
@@ -243,10 +251,6 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
       (dired-insert-set-properties point (point)))
     (setq buffer-read-only t)
     (let ((proc (get-buffer-process (current-buffer))))
-      ;; `find-dired-filter' should do with no changes at all.
-      (set-process-filter proc #'find-dired-filter)
-      ;; `find-dired-sentinel' needed minor changes, so there we go.
-      (set-process-sentinel proc #'tmsu-dired-sentinel)
       ;; Initialize the process marker; it is used by the filter.
       (move-marker (process-mark proc) (point) (current-buffer)))
     (setq mode-line-process '(":%s"))))
