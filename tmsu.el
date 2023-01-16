@@ -67,10 +67,10 @@ the list in a specific way."
   (split-string-shell-command
    (string-trim-right
     (with-output-to-string
-      (unless (= (apply #'call-process "tmsu" nil standard-output nil
+      (unless (= (apply #'process-file "tmsu" nil standard-output nil
                         "tags" "--name=never" "--explicit" "--"
                         (when file
-                          (list file)))
+                          (list (file-local-name file))))
                  0)
         (error "Error when running TMSU"))))))
 
@@ -79,7 +79,7 @@ the list in a specific way."
   (split-string-shell-command
    (string-trim-right
     (with-output-to-string
-      (unless (= (apply #'call-process "tmsu" nil standard-output nil
+      (unless (= (apply #'process-file "tmsu" nil standard-output nil
                         "values"
                         (when tag
                           (list "--" tag)))
@@ -152,20 +152,20 @@ complete.  If nil, calls `tmsu-get-tags' instead."
 
 Should be called near the beginning of all the user-facing
 TMSU commands."
-  (= (call-process "tmsu" nil nil nil "info") 0))
+  (= (process-file "tmsu" nil nil nil "info") 0))
 
 (defun tmsu-tags-add (file &rest tags)
   "Add TAGS to FILE."
-  (apply #'call-process
+  (apply #'process-file
          "tmsu" nil nil nil
-         "tag" "--explicit" "--" file
+         "tag" "--explicit" "--" (file-local-name file)
          tags))
 
 (defun tmsu-tags-remove (file &rest tags)
   "Remove TAGS from FILE."
-  (apply #'call-process
+  (apply #'process-file
          "tmsu" nil nil nil
-         "untag" "--" file
+         "untag" "--" (file-local-name file)
          tags))
 
 ;;;###autoload

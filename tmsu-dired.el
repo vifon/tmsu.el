@@ -195,7 +195,7 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
                           (if flags
                               (concat " " flags)
                             "")
-                          (shell-quote-argument dir)
+                          (shell-quote-argument (file-local-name dir))
                           (mapconcat #'shell-quote-argument
                                      (tmsu-dired--preprocess-query query)
                                      " ")
