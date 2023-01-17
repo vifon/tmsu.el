@@ -53,7 +53,7 @@ Each function should accept the tag list as its only argument and
 return the modified tag list which is then passed to the next
 function.  One possible use for this variable would be to sort
 the list in a specific way."
-  :type '(repeat function))
+  :type 'hook)
 
 (defvar tmsu-edit-history nil
   "Command history of TMSU edits.")
