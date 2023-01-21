@@ -3,6 +3,7 @@
 ;; Copyright (C) 2022-2023  Wojciech Siewierski
 
 ;; Author: Wojciech Siewierski
+;; URL: https://github.com/vifon/tmsu.el
 ;; Keywords: files
 ;; Version: 0.9
 ;; Package-Requires: ((emacs "28.1"))
@@ -107,7 +108,7 @@ Customize to change the buffer naming convention."
     (concat "tmsu-query: " dir-name)))
 
 (defun tmsu-dired--preprocess-query (query)
-  "Preprocess the query to ensure correct semantics.
+  "Preprocess QUERY to ensure correct semantics.
 
 The list representation of the query might need some steps for it
 to have the expected semantics when combined into a single query.

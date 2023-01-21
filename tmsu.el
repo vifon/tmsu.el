@@ -3,6 +3,7 @@
 ;; Copyright (C) 2022-2023  Wojciech Siewierski
 
 ;; Author: Wojciech Siewierski
+;; URL: https://github.com/vifon/tmsu.el
 ;; Keywords: files
 ;; Version: 0.9
 ;; Package-Requires: ((emacs "28.1"))
