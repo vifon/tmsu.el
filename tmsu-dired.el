@@ -167,7 +167,8 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
   ;; Otherwise `dired' might reuse the tmsu-query buffers when
   ;; creating a fresh one would be more appropriate.
   (let ((dired-buffers dired-buffers)
-        command switches)
+        tmsu-command command
+        switches)
     (pop-to-buffer-same-window (get-buffer-create
                                 (funcall tmsu-dired-buffer-name-function
                                          dir query flags)))
@@ -195,14 +196,16 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
     ;; TODO: Consider respecting `dired-use-ls-dired'.
     (setq switches (concat "--quoting-style=literal " tmsu-dired-ls-switches))
 
-    (setq command (format "tmsu files%s --path %s -0 -- %s | xargs -0 %s -d %s"
-                          (if flags
-                              (concat " " flags)
-                            "")
-                          (shell-quote-argument (file-local-name dir))
-                          (mapconcat #'shell-quote-argument
-                                     (tmsu-dired--preprocess-query query)
-                                     " ")
+    (setq tmsu-command (format "tmsu files%s --path %s -0 -- %s"
+                               (if flags
+                                   (concat " " flags)
+                                 "")
+                               (shell-quote-argument (file-local-name dir))
+                               (mapconcat #'shell-quote-argument
+                                          (tmsu-dired--preprocess-query query)
+                                          " ")))
+    (setq command (format "%s | xargs -0 %s -d %s"
+                          tmsu-command
                           insert-directory-program
                           switches))
 
@@ -252,7 +255,7 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
     ;; Make second line a ``tmsu'' line in analogy to the ``total'' or
     ;; ``wildcard'' line.
     (let ((point (point)))
-      (insert "  " command "\n")
+      (insert "  " (string-replace "-0 " "" tmsu-command) "\n")
       (dired-insert-set-properties point (point)))
     (setq buffer-read-only t)
     (let ((proc (get-buffer-process (current-buffer))))
