@@ -66,8 +66,8 @@ editing a regular file's tags."
 
 (require 'find-dired)
 
-(defvar tmsu-dired-ls-switches "-lh --quoting-style=literal")
-(defvar tmsu-dired-ls-subdir-switches "-alh --quoting-style=literal")
+(defvar tmsu-dired-ls-switches "-lh")
+(defvar tmsu-dired-ls-subdir-switches "-alh")
 
 (defvar-local tmsu-dired-goto nil
   "A position to move the point to after loading a `tmsu-dired-query' buffer.
@@ -167,7 +167,7 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
   ;; Otherwise `dired' might reuse the tmsu-query buffers when
   ;; creating a fresh one would be more appropriate.
   (let ((dired-buffers dired-buffers)
-        command)
+        command switches)
     (pop-to-buffer-same-window (get-buffer-create
                                 (funcall tmsu-dired-buffer-name-function
                                          dir query flags)))
@@ -191,7 +191,11 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
     (kill-all-local-variables)
     (setq buffer-read-only nil)
     (erase-buffer)
-    (setq command (format "tmsu files%s --path %s -0 -- %s | xargs -0 ls -d %s"
+
+    ;; TODO: Consider respecting `dired-use-ls-dired'.
+    (setq switches (concat "--quoting-style=literal " tmsu-dired-ls-switches))
+
+    (setq command (format "tmsu files%s --path %s -0 -- %s | xargs -0 %s -d %s"
                           (if flags
                               (concat " " flags)
                             "")
@@ -199,7 +203,8 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
                           (mapconcat #'shell-quote-argument
                                      (tmsu-dired--preprocess-query query)
                                      " ")
-                          tmsu-dired-ls-switches))
+                          insert-directory-program
+                          switches))
 
     (make-process :name "tmsu-query"
                   :command `("sh" "-c" ,command)
