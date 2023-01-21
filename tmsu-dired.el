@@ -34,7 +34,7 @@
 
 If PARENT is non-nil, edit the current directory instead of
 the file at point."
-  (interactive "P")
+  (interactive "P" dired-mode)
   (let ((file-at-point (dired-get-file-for-visit)))
     (let ((file-to-edit
            (if parent
@@ -51,7 +51,7 @@ parent instead.
 
 \\[universal-argument] sets FORCE-EDIT-FILE to t and allows
 editing a regular file's tags."
-  (interactive "P")
+  (interactive "P" dired-mode)
   (let ((file-at-point (dired-get-file-for-visit)))
     (let ((file-to-edit (if (or (file-directory-p file-at-point)
                                 force-edit-file)
