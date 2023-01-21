@@ -32,6 +32,18 @@ The first type is supported out of the box.  The second one needs to be loaded:
 (require 'ol-tmsu)
 ```
 
+### Bulk operations (or the lack of them)
+
+Tagging many files at the same time is deliberately not supported.
+
+`dired-do-shell-command` (bound to <kbd>!</kbd> by default) can
+already run a command like `tmsu tag ? year=2000 genre=comedy` on the
+marked files.  Wrapping such command would be possible but not
+necessarily substantially beneficial.  Specifically there is no
+meaningful concept of the "current tags" for multiple files with
+possibly different tags, so the UI used for the single files cannot
+be reused.
+
 INSTALLATION
 ------------
 
