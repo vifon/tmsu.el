@@ -29,8 +29,9 @@
 
 (require 'ol)
 (eval-when-compile
-  (require 'subr-x)
-  (require 'tmsu-dired))
+  (require 'subr-x))
+
+(require 'tmsu-dired)
 
 
 (defconst org-tmsu-link-regex
