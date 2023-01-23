@@ -3,6 +3,7 @@
 ;; Copyright (C) 2023  Wojciech Siewierski
 
 ;; Author: Wojciech Siewierski
+;; URL: https://github.com/vifon/tmsu.el
 ;; Keywords: files, outlines, hypermedia
 ;; Version: 0.9
 ;; Package-Requires: ((emacs "28.1"))
@@ -40,8 +41,10 @@
       eol)
   "A regex matching an `org-mode' link this module generates.")
 
-(defun org-tmsu-open-link (link &optional arg)
-  "Implement the :follow handler for `org-store-link'."
+(defun org-tmsu-open-link (link &optional _arg)
+  "Implement the :follow handler for org LINKs saved from `tmsu-dired-query'.
+
+See `org-link-parameters' for the details."
   (require 'tmsu-dired)
   (string-match org-tmsu-link-regex link)
   (let ((dir   (match-string 1 link))
@@ -50,7 +53,9 @@
     (tmsu-dired-query dir (split-string query ",") flags)))
 
 (defun org-tmsu-store-link ()
-  "Implement the :store handler for `org-store-link'."
+  "Implement the :store handler for org LINKs saved from `org-store-link'.
+
+See `org-link-parameters' for the details."
   (when (and (eq major-mode 'dired-mode)
              (bound-and-true-p tmsu-query))
     (let* ((dir default-directory)

@@ -87,7 +87,9 @@ Customize to change the buffer naming convention."
           (function :tag "Custom")))
 
 (defun tmsu-dired-buffer-name (dir query flags)
-  "The default implementation of `tmsu-dired-buffer-name-function'."
+  "The default implementation of `tmsu-dired-buffer-name-function'.
+
+DIR, QUERY and FLAGS are the same arguments `tmsu-dired-query' got."
   (let ((query-pp (string-join (tmsu-dired--preprocess-query query)
                                " and "))
         (dir-name (file-name-nondirectory
@@ -100,8 +102,10 @@ Customize to change the buffer naming convention."
                 (concat " (" flags ")")
               ""))))
 
-(defun tmsu-dired-buffer-name-simple (dir query flags)
-  "An alternative implementation of `tmsu-dired-buffer-name-function'."
+(defun tmsu-dired-buffer-name-simple (dir _query _flags)
+  "An alternative implementation of `tmsu-dired-buffer-name-function'.
+
+DIR is the same as the first argument of `tmsu-dired-query'."
   (let ((dir-name (file-name-nondirectory
                    (directory-file-name
                     dir))))
@@ -267,7 +271,9 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
 (defun tmsu-dired-sentinel (proc state)
   "Sentinel for \\[tmsu-dired-query] processes.
 
-Enforces `tmsu-dired-goto'."
+Enforces `tmsu-dired-goto'.
+
+See `set-process-sentinel' for the details on the PROC and STATE arguments."
   (let ((buf (process-buffer proc)))
     (if (buffer-name buf)
         (with-current-buffer buf
@@ -298,8 +304,7 @@ Enforces `tmsu-dired-goto'."
 
 ;;;###autoload
 (defun tmsu-dired-bookmark-open (bookmark)
-  "Implements the handler function for bookmarks created with
-`tmsu-dired-bookmark-make-record'."
+  "Handler for the BOOKMARKs created with `tmsu-dired-bookmark-make-record'."
   (let ((dir (bookmark-get-filename bookmark))
         (position (bookmark-get-position bookmark))
         (forward-str (bookmark-get-front-context-string bookmark))
@@ -319,8 +324,7 @@ Enforces `tmsu-dired-goto'."
 
 (defcustom tmsu-dired-pretty-description-function
   #'tmsu-dired-pretty-description
-  "A function used to generate pretty-printed buffer names for
-`tmsu-dired-query'.
+  "Function generating pretty-printed buffer names for `tmsu-dired-query'.
 
 Used for the bookmark and link default name generation."
   :type 'function)
@@ -341,8 +345,7 @@ respective value is being inferred from the current buffer."
             dir))))
 
 (defun tmsu-dired-bookmark-make-record ()
-  "Implements `bookmark-make-record-function' for the
-`tmsu-dired-query' buffers."
+  "Implements `bookmark-make-record-function' for `tmsu-dired-query'."
   (let* ((dir default-directory)
          (query tmsu-query)
          (flags tmsu-flags)
