@@ -31,6 +31,12 @@
 
 (require 'tmsu)
 
+
+(defgroup tmsu-dired nil
+  "An interface between TMSU and Dired."
+  :group 'tmsu)
+
+
 ;;;###autoload
 (defun tmsu-dired-edit (parent)
   "Edit the tags of the file at point.
