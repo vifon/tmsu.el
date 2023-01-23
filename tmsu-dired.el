@@ -1,4 +1,4 @@
-;;; tmsu-dired.el --- A basic interface between TMSU and Dired    -*- lexical-binding: t; -*-
+;;; tmsu-dired.el --- An interface between TMSU and Dired    -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2022-2023  Wojciech Siewierski
 
@@ -23,7 +23,7 @@
 
 ;;; Commentary:
 
-;; A basic interface between TMSU and Dired.
+;; An interface between TMSU and Dired.
 
 ;;; Code:
 

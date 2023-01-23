@@ -23,7 +23,7 @@
 
 ;;; Commentary:
 
-;; A basic TMSU interface.
+;; A TMSU interface.
 ;; See: https://tmsu.org/
 
 ;;; Code:
@@ -35,7 +35,7 @@
 
 
 (defgroup tmsu nil
-  "A basic TMSU interface."
+  "A TMSU interface."
   :group 'files)
 
 
