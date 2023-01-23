@@ -63,3 +63,11 @@ If you prefer to attach your TMSU tags to directories and not single
 files (think: a directory with a set of movies with common tags), use
 `tmsu-dired-edit-directory` instead of `tmsu-dired-edit`.  See their
 docstrings for the details.
+
+For the `org-mode` links support, this is the suggested setup:
+
+```elisp
+(use-package ol-tmsu
+  :after (:any org tmsu-dired)
+  :if (executable-find "tmsu"))
+```
