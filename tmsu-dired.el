@@ -27,6 +27,8 @@
 
 ;;; Code:
 
+(require 'bookmark)
+
 (require 'tmsu)
 
 ;;;###autoload
@@ -69,6 +71,9 @@ editing a regular file's tags."
 
 (defvar tmsu-dired-ls-switches "-lh")
 (defvar tmsu-dired-ls-subdir-switches "-alh")
+
+(defvar-local tmsu-dired-query-args nil)
+(defvar-local tmsu-dired-query-flags nil)
 
 (defvar-local tmsu-dired-goto nil
   "A position to move the point to after loading a `tmsu-dired-query' buffer.
@@ -159,8 +164,8 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
     (setq query (completing-read-multiple "TMSU query: "
                                           (tmsu--completion tmsu--expression-regex)
                                           nil nil nil 'tmsu-query-history
-                                          (when (bound-and-true-p tmsu-query)
-                                            (string-join tmsu-query ",")))))
+                                          (when tmsu-dired-query-args
+                                            (string-join tmsu-dired-query-args ",")))))
 
   (when (and (not flags)
              current-prefix-arg)
@@ -169,8 +174,8 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
   ;; Done preparing the interactive arguments!
 
   ;; Do not modify the global value of `dired-buffers'.
-  ;; Otherwise `dired' might reuse the tmsu-query buffers when
-  ;; creating a fresh one would be more appropriate.
+  ;; Otherwise `dired' might reuse the tmsu-dired-query-args buffers
+  ;; when creating a fresh one would be more appropriate.
   (let ((dired-buffers dired-buffers)
         tmsu-command command
         switches)
@@ -231,8 +236,8 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
       (use-local-map map))
 
     ;; For later buffer-local access.
-    (setq-local tmsu-query query)
-    (setq-local tmsu-flags flags)
+    (setq-local tmsu-dired-query-args query)
+    (setq-local tmsu-dired-query-flags flags)
 
     (setq-local bookmark-make-record-function #'tmsu-dired-bookmark-make-record)
 
@@ -335,8 +340,8 @@ Used for the bookmark and link default name generation."
 If any of the DIR, QUERY and FLAGS arguments are nil, the
 respective value is being inferred from the current buffer."
   (setq dir   (or dir default-directory)
-        query (tmsu-dired--preprocess-query (or query tmsu-query))
-        flags (or flags tmsu-flags))
+        query (tmsu-dired--preprocess-query (or query tmsu-dired-query-args))
+        flags (or flags tmsu-dired-query-flags))
   (concat "tmsu:"
           (string-join query " and ")
           " @ "
@@ -347,8 +352,8 @@ respective value is being inferred from the current buffer."
 (defun tmsu-dired-bookmark-make-record ()
   "Implements `bookmark-make-record-function' for `tmsu-dired-query'."
   (let* ((dir default-directory)
-         (query tmsu-query)
-         (flags tmsu-flags)
+         (query tmsu-dired-query-args)
+         (flags tmsu-dired-query-flags)
          (desc (funcall tmsu-dired-pretty-description-function)))
     `(,desc
       ,@(bookmark-make-record-default 'no-file)

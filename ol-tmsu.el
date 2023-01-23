@@ -28,9 +28,10 @@
 ;;; Code:
 
 (require 'ol)
-
 (eval-when-compile
-  (require 'subr-x))
+  (require 'subr-x)
+  (require 'tmsu-dired))
+
 
 (defconst org-tmsu-link-regex
   (rx (group (*? any))
@@ -57,10 +58,10 @@ See `org-link-parameters' for the details."
 
 See `org-link-parameters' for the details."
   (when (and (eq major-mode 'dired-mode)
-             (bound-and-true-p tmsu-query))
+             (bound-and-true-p tmsu-dired-query-args))
     (let* ((dir default-directory)
-           (query (string-join tmsu-query ","))
-           (flags tmsu-flags)
+           (query (string-join tmsu-dired-query-args ","))
+           (flags tmsu-dired-query-flags)
            (link (if flags
                      (concat "tmsu:" dir "::" query "::" flags)
                    (concat "tmsu:" dir "::" query)))
