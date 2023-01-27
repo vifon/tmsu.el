@@ -197,18 +197,18 @@ TMSU commands."
     (message "TMSU tags change on `%s': %S: %s"
              file-name
              (tmsu-get-tags file)
-             (mapconcat #'identity
-                        (nconc (mapcar (lambda (tag)
-                                         (concat "-"
-                                                 (propertize tag
-                                                             'face 'tmsu-removed-face)))
-                                       tags-removed)
-                               (mapcar (lambda (tag)
-                                         (concat "+"
-                                                 (propertize tag
-                                                             'face 'tmsu-added-face)))
-                                       tags-added))
-                        " "))))
+             (string-join
+              (nconc (mapcar (lambda (tag)
+                               (concat "-"
+                                       (propertize tag
+                                                   'face 'tmsu-removed-face)))
+                             tags-removed)
+                     (mapcar (lambda (tag)
+                               (concat "+"
+                                       (propertize tag
+                                                   'face 'tmsu-added-face)))
+                             tags-added))
+              " "))))
 
 (provide 'tmsu)
 ;;; tmsu.el ends here
