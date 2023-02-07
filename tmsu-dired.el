@@ -27,6 +27,7 @@
 ;;; Code:
 
 (require 'bookmark)
+(require 'dired)
 
 (require 'tmsu)
 
