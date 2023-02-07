@@ -47,7 +47,6 @@
   "Implement the :follow handler for org LINKs saved from `tmsu-dired-query'.
 
 See `org-link-parameters' for the details."
-  (require 'tmsu-dired)
   (string-match org-tmsu-link-regex link)
   (let ((dir   (match-string 1 link))
         (query (match-string 2 link))
