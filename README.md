@@ -47,11 +47,11 @@ be reused.
 INSTALLATION
 ------------
 
-To install `tmsu.el` using `straight.el`, use the following code:
+To install `tmsu.el`, you can use the following code:
 
 ```elisp
 (use-package tmsu
-  :straight (:host github :repo "vifon/tmsu.el")
+  :ensure t
   :after dired
   :bind (:map dired-mode-map
          (";" . tmsu-dired-edit)
@@ -68,6 +68,7 @@ For the `org-mode` links support, this is the suggested setup:
 
 ```elisp
 (use-package ol-tmsu
+  :ensure t
   :after (:any org tmsu-dired)
   :if (executable-find "tmsu"))
 ```
