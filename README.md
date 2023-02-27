@@ -72,3 +72,28 @@ For the `org-mode` links support, this is the suggested setup:
   :after (:any org tmsu-dired)
   :if (executable-find "tmsu"))
 ```
+
+**Orderless compatibility**
+
+If you're using [Orderless](https://github.com/oantolin/orderless)
+with a style dispatcher using `=` as a suffix (which is the default
+since early 2023 when `orderless-affix-dispatch` got added), you may
+want to add the following snippet:
+
+```elisp
+(defun call-without-orderless-dispatchers (orig &rest args)
+  "Use with `advice-add' (`:around') to ignore the dispatchers."
+  (let ((orderless-style-dispatchers nil))
+    (apply orig args)))
+
+(advice-add 'tmsu-dired-edit :around
+            #'call-without-orderless-dispatchers)
+(advice-add 'tmsu-dired-edit-directory :around
+            #'call-without-orderless-dispatchers)
+(advice-add 'tmsu-dired-query :around
+            #'call-without-orderless-dispatchers)
+```
+
+This modification allows the completion suggestions for inputs like
+`tag=` to show up immediately and not only after the next keypress
+(that makes the input not end with `=` anymore).
