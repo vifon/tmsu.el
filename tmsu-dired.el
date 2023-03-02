@@ -365,9 +365,8 @@ respective value is being inferred from the current buffer."
          (flags tmsu-dired-query-flags)
          (desc (funcall tmsu-dired-pretty-description-function)))
     `(,desc
-      ,@(bookmark-make-record-default 'no-file)
+      ,@(bookmark-make-record-default)
       (handler . tmsu-dired-bookmark-open)
-      (filename . ,dir)
       (tmsu-query . ,query)
       (tmsu-flags . ,flags))))
 
