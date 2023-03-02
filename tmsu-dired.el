@@ -305,6 +305,8 @@ See `set-process-sentinel' for the details on the PROC and STATE arguments."
               ;; will stay around until M-x `list-processes'.
               (delete-process proc)
               (force-mode-line-update)))
+          (goto-char (point-min))
+          (dired-initial-position default-directory)
           (when tmsu-dired-goto
             (if (functionp tmsu-dired-goto)
                 (funcall tmsu-dired-goto)
