@@ -329,7 +329,8 @@ See `set-process-sentinel' for the details on the PROC and STATE arguments."
                       flags)
     (setq-local tmsu-dired-goto
                 (lambda ()
-                  (goto-char position)
+                  (when position
+                    (goto-char position))
                   (when (and forward-str (search-forward forward-str (point-max) t))
                     (goto-char (match-beginning 0)))
                   (when (and behind-str  (search-backward behind-str (point-min) t))
