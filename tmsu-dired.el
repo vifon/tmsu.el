@@ -154,24 +154,28 @@ Interactively it's always the current directory.
 Interactively ask for the FLAGS only if \\[universal-argument] got passed."
   (interactive)
 
-  ;; Either change the directory to the provided one, or accept the
-  ;; current one as the argument.
-  (if dir
-      (setq default-directory dir)
-    (setq dir (if (eq major-mode 'dired-mode)
-                  (dired-current-directory)
-                default-directory)))
+  (setq dir (or dir
+                (if (eq major-mode 'dired-mode)
+                    (dired-current-directory)
+                  default-directory)))
 
-  ;; Now that we're in the correct directory, make sure the DB is present.
-  (unless (tmsu-database-p)
-    (error "No TMSU database"))
+  ;; We still didn't open a new buffer, so we can't just set
+  ;; `default-directory', and we cannot open a new buffer first
+  ;; either, as its name will be based on the values we're about to
+  ;; read.  We can either set a local `default-directory' value or use
+  ;; a temporary buffer name and rename it later.  The former seems
+  ;; cleaner.  The key takeaway: we'll need to set `default-directory'
+  ;; again a little lower.
+  (let ((default-directory dir))
+    (unless (tmsu-database-p)
+      (error "No TMSU database"))
 
-  (unless query
-    (setq query (completing-read-multiple "TMSU query: "
-                                          (tmsu--completion tmsu--expression-regex)
-                                          nil nil nil 'tmsu-query-history
-                                          (when tmsu-dired-query-args
-                                            (string-join tmsu-dired-query-args ",")))))
+    (unless query
+      (setq query (completing-read-multiple "TMSU query: "
+                                            (tmsu--completion tmsu--expression-regex)
+                                            nil nil nil 'tmsu-query-history
+                                            (when tmsu-dired-query-args
+                                              (string-join tmsu-dired-query-args ","))))))
 
   (when (and (not flags)
              current-prefix-arg)
@@ -188,6 +192,8 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
     (pop-to-buffer-same-window (get-buffer-create
                                 (funcall tmsu-dired-buffer-name-function
                                          dir query flags)))
+
+    (setq default-directory dir)
 
     ;; See if there's still a `tmsu' running, and offer to kill it
     ;; first, if it is.
