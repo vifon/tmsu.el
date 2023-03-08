@@ -211,13 +211,7 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
           (error "Cannot have two processes in `%s' at once" (buffer-name)))))
 
     (widen)
-    (let ((current-bookmark bookmark-current-bookmark))
-      (kill-all-local-variables)
-      ;; Preserve the bookmark name supposedly used to access this
-      ;; buffer even when the local variables are being killed.
-      ;; This allows easy access to the current bookmark name in the
-      ;; `bookmark-set' prompt even after reverting the buffer.
-      (setq-local bookmark-current-bookmark current-bookmark))
+    (kill-all-local-variables)
     (setq buffer-read-only nil)
     (erase-buffer)
 
