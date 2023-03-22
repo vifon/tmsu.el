@@ -80,12 +80,12 @@ the list in a specific way."
   (split-string-shell-command
    (string-trim-right
     (with-output-to-string
-      (unless (= (apply #'process-file "tmsu" nil standard-output nil
-                        "values"
-                        (when tag
-                          (list "--" tag)))
-                 0)
-        (error "No such tag: %s" tag))))))
+      (apply #'process-file "tmsu" nil
+             (list standard-output nil)
+             nil
+             "values"
+             (when tag
+               (list "--" tag)))))))
 
 (defconst tmsu--key-value-regex
   (rx bos
