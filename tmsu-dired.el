@@ -376,5 +376,25 @@ respective value is being inferred from the current buffer."
       (tmsu-query . ,query)
       (tmsu-flags . ,flags))))
 
+
+(defun tmsu-dired-rename-repair (oldname newname &rest _)
+  "Preserve the OLDNAME file TMSU tags when renaming it to NEWNAME."
+  (ignore-errors
+    (process-file "tmsu" nil nil nil
+                  "repair" "-m"
+                  (file-local-name oldname)
+                  (file-local-name newname))))
+
+;;;###autoload
+(define-minor-mode tmsu-dired-rename-repair-mode
+  "Preserve the TMSU tags upon file rename in `dired'."
+  :global t
+  :lighter " tmsu-dired-rename"
+  (if tmsu-dired-rename-repair-mode
+      (advice-add #'dired-rename-file :after
+                  #'tmsu-dired-rename-repair)
+    (advice-remove #'dired-rename-file
+                   #'tmsu-dired-rename-repair)))
+
 (provide 'tmsu-dired)
 ;;; tmsu-dired.el ends here
