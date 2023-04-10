@@ -63,17 +63,26 @@ the list in a specific way."
   "Command history of TMSU queries.")
 
 
-(defun tmsu-get-tags (&optional file)
-  "Fetch the TMSU tags of FILE or all tags in the database."
-  (split-string-shell-command
-   (string-trim-right
-    (with-output-to-string
-      (unless (= (apply #'process-file "tmsu" nil standard-output nil
-                        "tags" "--name=never" "--explicit" "--"
-                        (when file
-                          (list (file-local-name file))))
-                 0)
-        (error "Error when running TMSU"))))))
+(defun tmsu-get-tags (&optional file tags)
+  "Fetch the TMSU tags of FILE or all tags in the database.
+
+If TAGS is provided, filter the results to only these tags'
+values.  It can be either a string or a list of strings."
+  (let ((file-tags (split-string-shell-command
+                    (string-trim-right
+                     (with-output-to-string
+                       (unless (= (apply #'process-file "tmsu" nil standard-output nil
+                                         "tags" "--name=never" "--explicit" "--"
+                                         (when file
+                                           (list (file-local-name file))))
+                                  0)
+                         (error "Error when running TMSU")))))))
+    (if tags
+        (cl-delete-if-not
+         (apply-partially #'string-match-p
+                          (concat "^" (regexp-opt (ensure-list tags)) "="))
+         file-tags)
+      file-tags)))
 
 (defun tmsu-get-values (&optional tag)
   "Fetch the TMSU values of TAG of all values in the database."
