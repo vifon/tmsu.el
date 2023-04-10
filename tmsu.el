@@ -134,6 +134,22 @@ affects the completion: they can still be used by hand.
 
 Example input: not year < 2000")
 
+(defun tmsu-tag-key (key-value)
+  "Return the key part of KEY-VALUE.
+
+For convenience returns nil when passed nil."
+  (when key-value
+    (string-match tmsu--key-value-regex key-value)
+    (match-string 2 key-value)))
+
+(defun tmsu-tag-value (key-value)
+  "Return the value part of KEY-VALUE.
+
+For convenience returns nil when passed nil."
+  (when key-value
+    (string-match tmsu--key-value-regex key-value)
+    (match-string 4 key-value)))
+
 (defun tmsu--completion (regex &optional tags)
   "Generate a completion function for `completing-read'.
 
