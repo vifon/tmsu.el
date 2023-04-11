@@ -78,8 +78,10 @@ editing a regular file's tags."
 (defvar tmsu-dired-ls-switches "-lh")
 (defvar tmsu-dired-ls-subdir-switches "-alh")
 
-(defvar-local tmsu-dired-query-args nil)
-(defvar-local tmsu-dired-query-flags nil)
+(defvar-local tmsu-dired-query-args nil
+  "The QUERY argument used for this buffer's `tmsu-dired-query' call.")
+(defvar-local tmsu-dired-query-flags nil
+  "The FLAGS argument used for this buffer's `tmsu-dired-query' call.")
 
 (defvar-local tmsu-dired-goto nil
   "A position to move the point to after loading a `tmsu-dired-query' buffer.
