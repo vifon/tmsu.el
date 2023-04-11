@@ -46,12 +46,9 @@ The pre-computed tags for the current file can be passed with
 FILE-TAGS.  This way no additional TMSU queries are performed.
 FILE-TAGS should be a cons cell with the filename in its `car'
 and the tag list in its `cdr'."
-  (when-let* ((file (if file-tags
-                        (car file-tags)
-                      (dired-get-filename nil t)))
-              (values (if file-tags
-                          (cdr file-tags)
-                        (tmsu-get-tags file tags))))
+  (when-let ((values (if file-tags
+                         (cdr file-tags)
+                       (tmsu-get-tags (dired-get-filename nil t) tags))))
     (end-of-line)
     (let ((ov (make-overlay (point) (point) nil t nil)))
       (overlay-put ov 'after-string
