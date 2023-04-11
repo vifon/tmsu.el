@@ -55,7 +55,8 @@ To install `tmsu.el`, you can use the following code:
   :after dired
   :bind (:map dired-mode-map
          (";" . tmsu-dired-edit)
-         ("M-;" . tmsu-dired-query))
+         ("M-;" . tmsu-dired-query)
+         ("C-M-;". tmsu-dired-overlay))
   :config (require 'tmsu-dired))
 ```
 
