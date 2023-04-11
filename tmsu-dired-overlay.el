@@ -45,7 +45,9 @@
 The pre-computed tags for the current file can be passed with
 FILE-TAGS.  This way no additional TMSU queries are performed.
 FILE-TAGS should be a cons cell with the filename in its `car'
-and the tag list in its `cdr'."
+and the tag list in its `cdr'.  In such case it's expected for
+FILE-TAGS to already be pre-filtered and the value of TAGS
+is ignored."
   (when-let ((values (if file-tags
                          (cdr file-tags)
                        (tmsu-get-tags (dired-get-filename nil t) tags))))
