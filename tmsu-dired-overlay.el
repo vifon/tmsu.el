@@ -39,6 +39,22 @@
   (remove-function (local 'revert-buffer-function)
                    #'tmsu-dired-overlay-delete-overlays))
 
+(defun tmsu-dired-overlay-follow-link (button)
+  "Follow the BUTTON and call `tmsu-dired-query' accordingly."
+  ;; This `default-directory' could have been a call to
+  ;; `dired-current-directory' for slightly different semantics.
+  ;; This choice is deliberate and not a bug, as I find these
+  ;; semantics reasonable.
+  (tmsu-dired-query default-directory
+                    (cons (button-get button 'tmsu-tag) tmsu-dired-query-args)
+                    tmsu-dired-query-flags))
+
+(define-button-type 'tmsu-dired-overlay-button
+  'follow-link t
+  'action #'tmsu-dired-overlay-follow-link
+  'help-echo "mouse-2: narrow down the TMSU query"
+  'face 'italic)
+
 (defun tmsu-dired-overlay-create-overlay-at-point (tags &optional file-tags)
   "Add an overlay with TAGS values on the current `dired' line.
 
@@ -54,36 +70,26 @@ is ignored."
     (end-of-line)
     (let ((ov (make-overlay (point) (point) nil t nil)))
       (overlay-put ov 'after-string
-                   (concat
-                    (propertize " \t"
-                                'cursor t)
-                    (propertize
-                     (mapconcat
-                      (lambda (tag)
-                        (let ((click-command
-                               (lambda ()
-                                 (interactive)
-                                 ;; This `default-directory' could
-                                 ;; have been a call to
-                                 ;; `dired-current-directory' for
-                                 ;; slightly different semantics.
-                                 ;; This choice is deliberate and not
-                                 ;; a bug, as I find these
-                                 ;; semantics reasonable.
-                                 (tmsu-dired-query default-directory
-                                                   (cons tag tmsu-dired-query-args)
-                                                   tmsu-dired-query-flags))))
-                          (propertize
-                           tag
-                           'mouse-face 'highlight
-                           'help-echo (concat "mouse-2: " "TMSU query: " tag)
-                           'keymap (let ((map (make-sparse-keymap)))
-                                     (define-key map [mouse-2] click-command)
-                                     (define-key map (kbd "RET") click-command)
-                                     (define-key map [follow-link] 'mouse-face)
-                                     map))))
-                      values ",")
-                     'face 'italic)))
+                   (with-temp-buffer
+                     (insert
+                      ;; Display the cursor before the overlay, not after.
+                      (propertize " " 'cursor t)
+                      ;; Crudely align the tag lists using tab-stops.
+                      ;; Won't be pretty, but won't be terrible
+                      ;; either.  Should always provide at least two
+                      ;; characters of spacing.
+                      "\t")
+                     (dolist (tag values)
+                       (insert-text-button tag
+                                           :type 'tmsu-dired-overlay-button
+                                           'tmsu-tag tag)
+                       (insert ","))
+                     ;; Remove the "," after the last tag.  Would be
+                     ;; buggy for an empty list, but this scenario
+                     ;; will never happen due to the check at the
+                     ;; beginning of this function.
+                     (delete-char -1)
+                     (buffer-string)))
       (push ov tmsu-dired-overlay-overlays))))
 
 ;;;###autoload
