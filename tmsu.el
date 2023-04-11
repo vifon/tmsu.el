@@ -67,7 +67,10 @@ the list in a specific way."
   "Fetch the TMSU tags of FILE or all tags in the database.
 
 If TAGS is provided, filter the results to only these tags'
-values.  It can be either a string or a list of strings."
+values.  It can be either a string or a list of strings.
+
+When used in a loop, it's usually better to use
+`tmsu-get-tags-for-files' to handle it in a single TMSU query."
   (let ((file-tags (split-string-shell-command
                     (string-trim-right
                      (with-output-to-string
@@ -83,6 +86,43 @@ values.  It can be either a string or a list of strings."
                           (concat "^" (regexp-opt (ensure-list tags)) "="))
          file-tags)
       file-tags)))
+
+(defun tmsu-get-tags-for-files (files &optional tags)
+  "Efficiently query multiple FILES for TAGS.
+
+The result is an alist of files and their tags."
+  (let ((file-tags-alist
+         (cl-mapcar
+          (lambda (file tags)
+            (cons file
+                  ;; We requested the filename only to force TMSU into
+                  ;; the one-line-per-file mode, let's drop the
+                  ;; filename now and reuse the one we asked about in
+                  ;; the first place.  Alternatively we could use this
+                  ;; one, but we'd need to match and unquote
+                  ;; it anyway.
+                  (when (string-match "[^\\]: \\(.*\\)$" tags)
+                    (split-string-shell-command (match-string 1 tags)))))
+          files
+          (string-lines
+           (string-trim-right
+            (with-output-to-string
+              (unless (= (apply #'process-file "tmsu" nil standard-output nil
+                                "tags" "--name=always" "--explicit" "--"
+                                (mapcar #'file-local-name files))
+                         0)
+                (error "Error when running TMSU"))))))))
+    (if tags
+        (let ((pred (apply-partially #'string-match-p
+                                     (concat "^" (regexp-opt (ensure-list tags)) "="))))
+          (mapcar
+           (lambda (file-tags)
+             (cons (car file-tags)
+                   (cl-delete-if-not
+                    pred
+                    (cdr file-tags))))
+           file-tags-alist))
+      file-tags-alist)))
 
 (defun tmsu-get-values (&optional tag)
   "Fetch the TMSU values of TAG of all values in the database."
