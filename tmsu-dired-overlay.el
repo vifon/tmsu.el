@@ -71,7 +71,8 @@ and the tag list in its `cdr'."
                                  (tmsu-dired-query default-directory
                                                    (cons tag tmsu-dired-query-args)
                                                    tmsu-dired-query-flags))))
-                          (propertize tag
+                          (propertize
+                           tag
                            'mouse-face 'highlight
                            'help-echo (concat "mouse-2: " "TMSU query: " tag)
                            'keymap (let ((map (make-sparse-keymap)))
