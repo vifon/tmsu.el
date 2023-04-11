@@ -64,6 +64,13 @@ and the tag list in its `cdr'."
                         (let ((click-command
                                (lambda ()
                                  (interactive)
+                                 ;; This `default-directory' could
+                                 ;; have been a call to
+                                 ;; `dired-current-directory' for
+                                 ;; slightly different semantics.
+                                 ;; This choice is deliberate and not
+                                 ;; a bug, as I find these
+                                 ;; semantics reasonable.
                                  (tmsu-dired-query default-directory
                                                    (cons tag tmsu-dired-query-args)
                                                    tmsu-dired-query-flags))))
