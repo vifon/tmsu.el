@@ -29,6 +29,15 @@
 (require 'tmsu-dired)
 
 
+(defgroup tmsu-dired-overlay nil
+  "Dired overlays with TMSU tags."
+  :group 'tmsu-dired)
+
+
+(defface tmsu-dired-overlay-face
+  '((t (:inherit italic)))
+  "The face used for the tags in the overlays.")
+
 (defvar-local tmsu-dired-overlay-overlays nil)
 
 (defun tmsu-dired-overlay-delete-overlays (&rest _)
@@ -53,7 +62,7 @@
   'follow-link t
   'action #'tmsu-dired-overlay-follow-link
   'help-echo "mouse-2: narrow down the TMSU query"
-  'face 'italic)
+  'face 'tmsu-dired-overlay-face)
 
 (defun tmsu-dired-overlay-create-overlay-at-point (tags &optional file-tags)
   "Add an overlay with TAGS values on the current `dired' line.
