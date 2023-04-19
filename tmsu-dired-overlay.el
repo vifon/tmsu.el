@@ -52,7 +52,12 @@ itself from this variable's value."
                    #'tmsu-dired-overlay-delete-all-overlays))
 
 (defun tmsu-dired-overlay-delete-overlays (beg end)
-  "Delete `tmsu-dired-overlay-overlays' between positions BEG and END."
+  "Delete `tmsu-dired-overlay-overlays' between positions BEG and END.
+
+Interactively BEG and END are `dired-subdir-min' and
+`dired-subdir-max' respectively."
+  (interactive (list (dired-subdir-min)
+                     (dired-subdir-max)))
   (dolist (ov (overlays-in beg end))
     (when (memq ov tmsu-dired-overlay-overlays)
       (setq tmsu-dired-overlay-overlays
