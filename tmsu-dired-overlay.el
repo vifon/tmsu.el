@@ -40,13 +40,24 @@
 
 (defvar-local tmsu-dired-overlay-overlays nil)
 
-(defun tmsu-dired-overlay-delete-overlays (&rest _)
-  "Delete all overlays in `tmsu-dired-overlay-overlays'."
+(defun tmsu-dired-overlay-delete-all-overlays (&rest _)
+  "Delete all overlays in `tmsu-dired-overlay-overlays'.
+
+Intended as an advice for `revert-buffer-function', removes
+itself from this variable's value."
   (interactive)
   (mapc #'delete-overlay tmsu-dired-overlay-overlays)
   (kill-local-variable 'tmsu-dired-overlay-overlays)
   (remove-function (local 'revert-buffer-function)
-                   #'tmsu-dired-overlay-delete-overlays))
+                   #'tmsu-dired-overlay-delete-all-overlays))
+
+(defun tmsu-dired-overlay-delete-overlays (beg end)
+  "Delete `tmsu-dired-overlay-overlays' between positions BEG and END."
+  (dolist (ov (overlays-in beg end))
+    (when (memq ov tmsu-dired-overlay-overlays)
+      (setq tmsu-dired-overlay-overlays
+            (delq ov tmsu-dired-overlay-overlays))
+      (delete-overlay ov))))
 
 (defun tmsu-dired-overlay-follow-link (button)
   "Follow the BUTTON and call `tmsu-dired-query' accordingly."
@@ -114,7 +125,8 @@ previous such overlays are removed first."
                        "TMSU tags to display: " (tmsu-get-tags)
                        nil nil nil 'tmsu-query-history)))
   (unless no-replace
-    (tmsu-dired-overlay-delete-overlays))
+    (tmsu-dired-overlay-delete-overlays (dired-subdir-min)
+                                        (dired-subdir-max)))
   (when tags
     (save-excursion
       (goto-char (dired-subdir-min))
@@ -128,7 +140,7 @@ previous such overlays are removed first."
              tags (assoc file file-tags-alist)))
           (forward-line 1))))
     (add-function :before (local 'revert-buffer-function)
-                  #'tmsu-dired-overlay-delete-overlays)))
+                  #'tmsu-dired-overlay-delete-all-overlays)))
 
 ;;;###autoload
 (defalias 'tmsu-dired-overlay 'tmsu-dired-overlay-create-overlays)
