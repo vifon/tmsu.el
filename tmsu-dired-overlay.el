@@ -51,13 +51,14 @@ itself from this variable's value."
   (remove-function (local 'revert-buffer-function)
                    #'tmsu-dired-overlay-delete-all-overlays))
 
-(defun tmsu-dired-overlay-delete-overlays (beg end)
+(defun tmsu-dired-overlay-delete-overlays (&optional beg end)
   "Delete `tmsu-dired-overlay-overlays' between positions BEG and END.
 
-Interactively BEG and END are `dired-subdir-min' and
+BEG and END default to `dired-subdir-min' and
 `dired-subdir-max' respectively."
-  (interactive (list (dired-subdir-min)
-                     (dired-subdir-max)))
+  (interactive)
+  (setq beg (or beg (dired-subdir-min))
+        end (or end (dired-subdir-max)))
   (dolist (ov (overlays-in beg end))
     (when (memq ov tmsu-dired-overlay-overlays)
       (setq tmsu-dired-overlay-overlays
