@@ -118,38 +118,43 @@ is ignored."
                      (buffer-string)))
       (push ov tmsu-dired-overlay-overlays))))
 
-;;;###autoload
-(defun tmsu-dired-overlay-create-overlays (tags &optional no-replace)
+(defun tmsu-dired-overlay-create-overlays (&optional tags)
   "Add overlays with the values of TAGS to all `dired' files.
 
-Unless NO-REPLACE is passed (\\[universal-argument]), the
-previous such overlays are removed first."
-  (interactive "i\nP")
-  (unless (tmsu-database-p)
-    (error "No TMSU database"))
-  (setq tags (or tags (completing-read-multiple
-                       "TMSU tags to display: " (tmsu-get-tags)
-                       nil nil nil 'tmsu-query-history)))
-  (unless no-replace
-    (tmsu-dired-overlay-delete-overlays (dired-subdir-min)
-                                        (dired-subdir-max)))
-  (when tags
-    (save-excursion
-      (goto-char (dired-subdir-min))
-      (let ((max (1- (dired-subdir-max)))
-            (file-tags-alist (tmsu-get-tags-for-files
-                              (directory-files (dired-current-directory) t)
-                              tags)))
-        (while (< (point) max)
-          (when-let ((file (dired-get-filename nil t)))
-            (tmsu-dired-overlay-create-overlay-at-point
-             tags (assoc file file-tags-alist)))
-          (forward-line 1))))
-    (add-function :before (local 'revert-buffer-function)
-                  #'tmsu-dired-overlay-delete-all-overlays)))
+If TAGS is nil, show all the tags with no filtering."
+  (save-excursion
+    (goto-char (dired-subdir-min))
+    (let ((max (1- (dired-subdir-max)))
+          (file-tags-alist (tmsu-get-tags-for-files
+                            (directory-files (dired-current-directory) t)
+                            tags)))
+      (while (< (point) max)
+        (when-let ((file (dired-get-filename nil t)))
+          (tmsu-dired-overlay-create-overlay-at-point
+           tags (assoc file file-tags-alist)))
+        (forward-line 1))))
+  (add-function :before (local 'revert-buffer-function)
+                #'tmsu-dired-overlay-delete-all-overlays))
 
 ;;;###autoload
-(defalias 'tmsu-dired-overlay 'tmsu-dired-overlay-create-overlays)
+(defun tmsu-dired-overlay (&optional only-remove)
+  "Interactively add/replace overlays with tag values to `dired'.
+
+When ONLY-REMOVE (\\[universal-argument]) is passed, don't ask
+for tags and only remove the tag overlays within the current
+subdir instead.
+
+Selecting an empty list of tags displays all the tags."
+  (interactive "P")
+  (unless (tmsu-database-p)
+    (error "No TMSU database"))
+  (if only-remove
+      (tmsu-dired-overlay-delete-overlays)
+    (let ((tags (completing-read-multiple
+                 "TMSU tags to display: " (tmsu-get-tags)
+                 nil nil nil 'tmsu-query-history)))
+      (tmsu-dired-overlay-delete-overlays)
+      (tmsu-dired-overlay-create-overlays tags))))
 
 (provide 'tmsu-dired-overlay)
 ;;; tmsu-dired-overlay.el ends here
