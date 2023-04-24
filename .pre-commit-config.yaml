@@ -1,0 +1,31 @@
+repos:
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v3.2.0
+  hooks:
+    - id: end-of-file-fixer
+      exclude: '^LICENSE$'
+    - id: check-yaml
+    - id: check-added-large-files
+
+- repo: meta
+  hooks:
+    - id: check-useless-excludes
+
+- repo: https://codeberg.org/vifon/pre-commit-hooks
+  rev: e29e31052769a9495e9b182b6103a8baf2dc5544
+  hooks:
+    - id: shellcheck
+    - id: elisp-check-parens
+    - id: elisp-checkdoc
+    - id: elisp-package-lint
+      args: [--main-file, tmsu.el]
+      files: |
+        (?x)^(
+        tmsu\.el|
+        tmsu-[^/]+\.el
+        )$
+    - id: elisp-package-lint
+      args: [--main-file, ol-tmsu.el]
+      files: '^ol-tmsu\.el$'
+    - id: no-elc
+    - id: no-tabs
