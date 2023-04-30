@@ -29,3 +29,17 @@ repos:
       files: '^ol-tmsu\.el$'
     - id: no-elc
     - id: no-tabs
+
+- repo: https://github.com/vifon/elisp-lint
+  rev: 91c069ae9634ec9f1dbc386007101487ddced29d
+  hooks:
+    - id: elisp-lint
+      args: [--main-file, tmsu.el]
+      files: |
+        (?x)^(
+        tmsu\.el|
+        tmsu-[^/]+\.el
+        )$
+    - id: elisp-lint
+      args: [--main-file, ol-tmsu.el]
+      files: '^ol-tmsu\.el$'
