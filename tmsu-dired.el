@@ -95,7 +95,8 @@ a query.")
 
 Customize to change the buffer naming convention."
   :type '(choice
-          (const :tag "Directory name with query and optional flags" tmsu-dired-buffer-name)
+          (const :tag "Directory name with query and optional flags"
+                 tmsu-dired-buffer-name)
           (const :tag "Directory name" tmsu-dired-buffer-name-simple)
           (function :tag "Custom")))
 
@@ -173,11 +174,12 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
       (error "No TMSU database"))
 
     (unless query
-      (setq query (completing-read-multiple "TMSU query: "
-                                            (tmsu--completion tmsu--expression-regex)
-                                            nil nil nil 'tmsu-query-history
-                                            (when tmsu-dired-query-args
-                                              (string-join tmsu-dired-query-args ","))))))
+      (setq query (completing-read-multiple
+                   "TMSU query: "
+                   (tmsu--completion tmsu--expression-regex)
+                   nil nil nil 'tmsu-query-history
+                   (when tmsu-dired-query-args
+                     (string-join tmsu-dired-query-args ","))))))
 
   (when (and (not flags)
              current-prefix-arg)
@@ -246,7 +248,8 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
     (let ((map (make-sparse-keymap)))
       (set-keymap-parent map (current-local-map))
       (define-key map (kbd "s") #'tmsu-dired-query)
-      (define-key map "\C-c\C-k" #'kill-find) ; Should be safe to reuse verbatim.
+      ;; It should be safe to reuse `kill-find' verbatim.
+      (define-key map "\C-c\C-k" #'kill-find)
       (use-local-map map))
 
     ;; For later buffer-local access.
@@ -339,9 +342,11 @@ See `set-process-sentinel' for the details on the PROC and STATE arguments."
                 (lambda ()
                   (when position
                     (goto-char position))
-                  (when (and forward-str (search-forward forward-str (point-max) t))
+                  (when (and forward-str
+                             (search-forward forward-str (point-max) t))
                     (goto-char (match-beginning 0)))
-                  (when (and behind-str  (search-backward behind-str (point-min) t))
+                  (when (and behind-str
+                             (search-backward behind-str (point-min) t))
                     (goto-char (match-end 0)))))))
 
 (defcustom tmsu-dired-pretty-description-function
@@ -368,8 +373,7 @@ respective value is being inferred from the current buffer."
 
 (defun tmsu-dired-bookmark-make-record ()
   "Implements `bookmark-make-record-function' for `tmsu-dired-query'."
-  (let* ((dir default-directory)
-         (query tmsu-dired-query-args)
+  (let* ((query tmsu-dired-query-args)
          (flags tmsu-dired-query-flags)
          (desc (funcall tmsu-dired-pretty-description-function)))
     `(,desc

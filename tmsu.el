@@ -74,10 +74,11 @@ When used in a loop, it's usually better to use
   (let ((file-tags (split-string-shell-command
                     (string-trim-right
                      (with-output-to-string
-                       (unless (= (apply #'process-file "tmsu" nil standard-output nil
-                                         "tags" "--name=never" "--explicit" "--"
-                                         (when file
-                                           (list (file-local-name file))))
+                       (unless (= (apply
+                                   #'process-file "tmsu" nil standard-output nil
+                                   "tags" "--name=never" "--explicit" "--"
+                                   (when file
+                                     (list (file-local-name file))))
                                   0)
                          (error "Error when running TMSU")))))))
     (if tags
@@ -113,8 +114,9 @@ The result is an alist of files and their tags."
                          0)
                 (error "Error when running TMSU"))))))))
     (if tags
-        (let ((pred (apply-partially #'string-match-p
-                                     (concat "^" (regexp-opt (ensure-list tags)) "="))))
+        (let ((pred (apply-partially
+                     #'string-match-p
+                     (concat "^" (regexp-opt (ensure-list tags)) "="))))
           (mapcar
            (lambda (file-tags)
              (cons (car file-tags)
@@ -246,12 +248,13 @@ TMSU commands."
          (tags-old (let ((tags (tmsu-get-tags file)))
                      (dolist (func tmsu-tag-list-preprocess-functions tags)
                        (setq tags (funcall func tags)))))
-         (tags-new (completing-read-multiple (format-message "Tag `%s': " file-name)
-                                             (tmsu--completion tmsu--key-value-regex
-                                                               tags-all)
-                                             nil nil
-                                             (string-join tags-old ",")
-                                             'tmsu-edit-history))
+         (tags-new (completing-read-multiple
+                    (format-message "Tag `%s': " file-name)
+                    (tmsu--completion tmsu--key-value-regex
+                                      tags-all)
+                    nil nil
+                    (string-join tags-old ",")
+                    'tmsu-edit-history))
          (tags-added   (cl-set-difference tags-new tags-old :test #'string=))
          (tags-removed (cl-set-difference tags-old tags-new :test #'string=)))
     (unless (or tags-added
