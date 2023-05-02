@@ -12,7 +12,7 @@ repos:
     - id: check-useless-excludes
 
 - repo: https://codeberg.org/vifon/pre-commit-hooks
-  rev: e29e31052769a9495e9b182b6103a8baf2dc5544
+  rev: 779f29ebd525d11923aa3578b3a94a13bbef1249
   hooks:
     - id: shellcheck
     - id: elisp-check-parens
@@ -31,7 +31,7 @@ repos:
     - id: no-tabs
 
 - repo: https://github.com/vifon/elisp-lint
-  rev: 91c069ae9634ec9f1dbc386007101487ddced29d
+  rev: 4d967b7721823be267c20cbe0dc07d3152a6fc19
   hooks:
     - id: elisp-lint
       args: [--main-file, tmsu.el]
