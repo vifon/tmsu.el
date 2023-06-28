@@ -31,7 +31,7 @@ repos:
     - id: no-tabs
 
 - repo: https://github.com/vifon/elisp-lint
-  rev: 115841bbbc7a1b0cbe34443e72985f12878f04e6
+  rev: 7d9ec0f5141d2f3e4c0fc890d40fceca81f8eb6f
   hooks:
     - id: elisp-lint
       args: [--main-file, tmsu.el]
