@@ -7,10 +7,6 @@ repos:
     - id: check-yaml
     - id: check-added-large-files
 
-- repo: meta
-  hooks:
-    - id: check-useless-excludes
-
 - repo: https://codeberg.org/vifon/pre-commit-hooks
   rev: 779f29ebd525d11923aa3578b3a94a13bbef1249
   hooks:
@@ -28,7 +24,6 @@ repos:
       args: [--main-file, ol-tmsu.el]
       files: '^ol-tmsu\.el$'
     - id: no-elc
-    - id: no-tabs
 
 - repo: https://github.com/vifon/elisp-lint
   rev: 7d9ec0f5141d2f3e4c0fc890d40fceca81f8eb6f
