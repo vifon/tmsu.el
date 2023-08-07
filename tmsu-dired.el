@@ -278,7 +278,7 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
     (setq buffer-read-only nil)
     ;; Subdir headlerline must come first because the first marker in
     ;; subdir-alist points there.
-    (insert "  " dir ":\n")
+    (insert "  " (directory-file-name dir) ":\n")
     (when (bound-and-true-p dired-make-directory-clickable)
       (dired--make-directory-clickable))
     ;; Make second line a ``tmsu'' line in analogy to the ``total'' or
