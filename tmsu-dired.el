@@ -139,6 +139,12 @@ Customize to change the buffer naming convention."
           (const :tag "Directory name" tmsu-dired-buffer-name-simple)
           (function :tag "Custom")))
 
+(defcustom tmsu-dired-query-in-subtree t
+  "Limit the `tmsu-dired-query' results to the current subdirectory.
+
+Set to nil to always search in the whole TMSU database."
+  :type 'boolean)
+
 (defun tmsu-dired-buffer-name (dir query flags)
   "The default implementation of `tmsu-dired-buffer-name-function'.
 
@@ -261,11 +267,15 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
     ;; TODO: Consider respecting `dired-use-ls-dired'.
     (setq switches (concat "--quoting-style=literal " tmsu-dired-ls-switches))
 
-    (setq tmsu-command (format "tmsu files%s --path %s -0 -- %s"
+    (setq tmsu-command (format "tmsu files%s%s -0 -- %s"
                                (if flags
                                    (concat " " flags)
                                  "")
-                               (shell-quote-argument (file-local-name dir))
+                               (if tmsu-dired-query-in-subtree
+                                   (concat " --path "
+                                           (shell-quote-argument
+                                            (file-local-name dir)))
+                                 "")
                                (mapconcat #'shell-quote-argument
                                           (tmsu-dired--preprocess-query query)
                                           " ")))
