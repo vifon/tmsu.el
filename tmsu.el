@@ -192,7 +192,14 @@ For convenience returns nil when passed nil."
     (string-match tmsu--key-value-regex key-value)
     (match-string 4 key-value)))
 
-(defun tmsu--completion (regex &optional tags)
+(defun tmsu--escape-value (value)
+  "Escape a key=value tag's VALUE."
+  (replace-regexp-in-string
+   (rx (group (any "\\<>() ")))
+   "\\\\\\1"
+   value))
+
+(defun tmsu--completion (regex &optional tags escape-values)
   "Generate a completion function for `completing-read'.
 
 REGEX determines what expressions should offer a tag value as
@@ -200,7 +207,10 @@ a completion.  Usually either `tmsu--key-value-regex' or
 `tmsu--expression-regex'.
 
 TAGS can be provided as a pre-computed list of all tags to
-complete.  If nil, calls `tmsu-get-tags' instead."
+complete.  If nil, calls `tmsu-get-tags' instead.
+
+The values of the key=value tags are completed escaped using
+`tmsu--escape-value' if ESCAPE-VALUES is non-nil."
   (setq tags (or tags (tmsu-get-tags)))
   (completion-table-dynamic
    (lambda (string)
@@ -210,7 +220,10 @@ complete.  If nil, calls `tmsu-get-tags' instead."
                (infix (match-string 3 string)))
            (if infix
                (mapcar (lambda (value) (concat prefix key infix value))
-                       (tmsu-get-values key))
+                       (mapcar (if escape-values
+                                   #'tmsu--escape-value
+                                 #'identity)
+                               (tmsu-get-values key)))
              (mapcar (lambda (tag) (concat prefix tag))
                      tags)))
        tags))))

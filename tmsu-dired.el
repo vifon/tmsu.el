@@ -176,7 +176,7 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
     (unless query
       (setq query (completing-read-multiple
                    "TMSU query: "
-                   (tmsu--completion tmsu--expression-regex)
+                   (tmsu--completion tmsu--expression-regex nil 'escape-values)
                    nil nil nil 'tmsu-query-history
                    (when tmsu-dired-query-args
                      (string-join tmsu-dired-query-args ","))))))
