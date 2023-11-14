@@ -1,4 +1,5 @@
 (require 'ert)
+(require 'pcase)
 
 (require 'tmsu)
 
@@ -8,79 +9,70 @@
   (should (equal (tmsu--escape-value "foo <bar>") "foo\\ \\<bar\\>"))
   (should (equal (tmsu--escape-value "foo (bar)") "foo\\ \\(bar\\)")))
 
+(defun tmsu-test-completions (completion-table test-specs)
+  (mapc
+   (lambda (spec)
+     (pcase spec
+       (`(,input t)
+        (should (try-completion input completion-table)))
+       (`(,input nil)
+        (should-not (try-completion input completion-table)))
+       (`(,input ,expected)
+        (should (equal (try-completion input completion-table)
+                       expected)))))
+   test-specs))
+
 (ert-deftest tmsu-test-completion-assignment ()
   (skip-unless (getenv "TMSU_TEST_MEDIA_DIR"))
   (let* ((default-directory (getenv "TMSU_TEST_MEDIA_DIR"))
          (completion-table (tmsu-completion-table-assignment)))
-    (should (equal
-             (try-completion "gen" completion-table)
-             "genre"))
-    (should (equal
-             (try-completion "genre=" completion-table)
-             "genre="))
-    (should-not (try-completion "genre = " completion-table))
-    (should-not (try-completion "not gen" completion-table))
-    (should (equal
-             (try-completion "genre=com" completion-table)
-             "genre=comedy"))
+    (tmsu-test-completions
+     completion-table
+     '(("gen"            "genre")
+       ("genre="         "genre=")
+       ("genre = "       nil)
+       ("not gen"        nil)
+       ("genre=com"      "genre=comedy")
+       ("year=19"        t)
+       ("year<19"        nil)
+       ("year>19"        nil)
+       ("year < 19"      nil)
+       ("year > 19"      nil)
+       ("year <= 19"     nil)
+       ("year >= 19"     nil)
+       ("staff=Makoto"   "staff=Makoto Shinkai")))
 
-    (should (try-completion "year=19" completion-table))
     (should (member
              "year=1979"
              (all-completions "year=19" completion-table)))
     (should-not (member
                  "year=2003"
-                 (all-completions "year=19" completion-table)))
-
-    (should-not (try-completion "year<19" completion-table))
-    (should-not (try-completion "year>19" completion-table))
-    (should-not (try-completion "year < 19" completion-table))
-    (should-not (try-completion "year > 19" completion-table))
-    (should-not (try-completion "year <= 19" completion-table))
-    (should-not (try-completion "year >= 19" completion-table))
-
-    (should (equal
-             (try-completion "staff=Makoto" completion-table)
-             "staff=Makoto Shinkai"))))
+                 (all-completions "year=19" completion-table)))))
 
 (ert-deftest tmsu-test-completion-query ()
   (skip-unless (getenv "TMSU_TEST_MEDIA_DIR"))
   (let* ((default-directory (getenv "TMSU_TEST_MEDIA_DIR"))
          (completion-table (tmsu-completion-table-expression)))
-    (should (equal
-             (try-completion "gen" completion-table)
-             "genre"))
-    (should (equal
-             (try-completion "not gen" completion-table)
-             "not genre"))
-    (should (equal
-             (try-completion "genre=" completion-table)
-             "genre="))
-    (should (equal
-             (try-completion "genre = " completion-table)
-             "genre = "))
-    (should (equal
-             (try-completion "genre=com" completion-table)
-             "genre=comedy"))
-    (should (equal
-             (try-completion "not genre=com" completion-table)
-             "not genre=comedy"))
+    (tmsu-test-completions
+     completion-table
+     '(("gen"            "genre")
+       ("genre="         "genre=")
+       ("genre = "       "genre = ")
+       ("not gen"        "not genre")
+       ("genre=com"      "genre=comedy")
+       ("not genre=com"  "not genre=comedy")
+       ("year=19"        t)
+       ("year<19"        t)
+       ("year>19"        t)
+       ("year < 19"      t)
+       ("year > 19"      t)
+       ("year <= 19"     t)
+       ("year >= 19"     t)
+       ("staff=Makoto"   "staff=Makoto\\ Shinkai")))
 
-    (should (try-completion "year=19" completion-table))
     (should (member
              "year=1979"
              (all-completions "year=19" completion-table)))
     (should-not (member
                  "year=2003"
-                 (all-completions "year=19" completion-table)))
-
-    (should (try-completion "year<19" completion-table))
-    (should (try-completion "year>19" completion-table))
-    (should (try-completion "year < 19" completion-table))
-    (should (try-completion "year > 19" completion-table))
-    (should (try-completion "year <= 19" completion-table))
-    (should (try-completion "year >= 19" completion-table))
-
-    (should (equal
-             (try-completion "staff=Makoto" completion-table)
-             "staff=Makoto\\ Shinkai"))))
+                 (all-completions "year=19" completion-table)))))
