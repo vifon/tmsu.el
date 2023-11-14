@@ -228,6 +228,24 @@ The values of the key=value tags are completed escaped using
                      tags)))
        tags))))
 
+(defun tmsu-completion-table-assignment (&optional tags)
+  "Generate a completion function for `completing-read'.
+
+It's suitable for the TMSU assignments.
+
+TAGS can be provided as a pre-computed list of all tags to
+complete.  If nil, calls `tmsu-get-tags' instead."
+  (tmsu--completion tmsu--key-value-regex tags))
+
+(defun tmsu-completion-table-expression (&optional tags)
+  "Generate a completion function for `completing-read'.
+
+It's suitable for the TMSU query expressions.
+
+TAGS can be provided as a pre-computed list of all tags to
+complete.  If nil, calls `tmsu-get-tags' instead."
+  (tmsu--completion tmsu--expression-regex tags 'escape-values))
+
 (defun tmsu-database-p ()
   "Check whether a TMSU database exists for the current directory.
 
@@ -263,8 +281,7 @@ TMSU commands."
                        (setq tags (funcall func tags)))))
          (tags-new (completing-read-multiple
                     (format-message "Tag `%s': " file-name)
-                    (tmsu--completion tmsu--key-value-regex
-                                      tags-all)
+                    (tmsu-completion-table-assignment tags-all)
                     nil nil
                     (string-join tags-old ",")
                     'tmsu-edit-history))
