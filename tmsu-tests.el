@@ -33,7 +33,7 @@
      ,@body)
   (when (getenv "TMSU_TEST_MEDIA_DIR")
     `(let ((default-directory (getenv "TMSU_TEST_MEDIA_DIR")))
-       (warn "Warning, testing TMSU on live data: %s" default-directory)
+       (warn "Testing TMSU on live data: %s" default-directory)
        ,@body)))
 
 
