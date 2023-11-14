@@ -28,12 +28,12 @@
 
 (defmacro tmsu-with-mocks (&rest body)
   (declare (indent 0))
-  (if (getenv "TMSU_TEST_MEDIA_DIR")
-      `(let ((default-directory (getenv "TMSU_TEST_MEDIA_DIR")))
-         (warn "Warning, testing TMSU on live data: %s" default-directory)
-         ,@body)
-    `(cl-letf (((symbol-function 'tmsu-get-tags) #'tmsu-mock-get-tags)
-               ((symbol-function 'tmsu-get-values) #'tmsu-mock-get-values))
+  `(cl-letf (((symbol-function 'tmsu-get-tags) #'tmsu-mock-get-tags)
+             ((symbol-function 'tmsu-get-values) #'tmsu-mock-get-values))
+     ,@body)
+  (when (getenv "TMSU_TEST_MEDIA_DIR")
+    `(let ((default-directory (getenv "TMSU_TEST_MEDIA_DIR")))
+       (warn "Warning, testing TMSU on live data: %s" default-directory)
        ,@body)))
 
 
