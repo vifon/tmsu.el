@@ -3,12 +3,8 @@
 
 (require 'tmsu)
 
-(ert-deftest tmsu-test-escaping ()
-  (should (equal (tmsu--escape-value "foo bar") "foo\\ bar"))
-  (should (equal (tmsu--escape-value "foo\\ bar") "foo\\\\\\ bar"))
-  (should (equal (tmsu--escape-value "foo <bar>") "foo\\ \\<bar\\>"))
-  (should (equal (tmsu--escape-value "foo (bar)") "foo\\ \\(bar\\)")))
-
+
+;;; Mocks and helpers
 
 (defvar tmsu-mock-tags
   '("genre" "year" "staff"))
@@ -61,6 +57,13 @@
         (should (equal (try-completion input completion-table)
                        expected)))))
    test-specs))
+
+
+(ert-deftest tmsu-test-escaping ()
+  (should (equal (tmsu--escape-value "foo bar") "foo\\ bar"))
+  (should (equal (tmsu--escape-value "foo\\ bar") "foo\\\\\\ bar"))
+  (should (equal (tmsu--escape-value "foo <bar>") "foo\\ \\<bar\\>"))
+  (should (equal (tmsu--escape-value "foo (bar)") "foo\\ \\(bar\\)")))
 
 (ert-deftest tmsu-test-completion-assignment ()
   (tmsu-with-mocks
