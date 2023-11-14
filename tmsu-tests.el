@@ -15,6 +15,10 @@
     (should (equal
              (try-completion "gen" completion-table)
              "genre"))
+    (should (equal
+             (try-completion "genre=" completion-table)
+             "genre="))
+    (should-not (try-completion "genre = " completion-table))
     (should-not (try-completion "not gen" completion-table))
     (should (equal
              (try-completion "genre=com" completion-table)
@@ -49,6 +53,12 @@
     (should (equal
              (try-completion "not gen" completion-table)
              "not genre"))
+    (should (equal
+             (try-completion "genre=" completion-table)
+             "genre="))
+    (should (equal
+             (try-completion "genre = " completion-table)
+             "genre = "))
     (should (equal
              (try-completion "genre=com" completion-table)
              "genre=comedy"))
