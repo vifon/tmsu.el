@@ -27,6 +27,10 @@
     (apply #'append (mapcar #'cdr tmsu-mock-values))))
 
 (defmacro tmsu-with-mocks (&rest body)
+  "Test BODY with the low-level TMSU functions mocked.
+
+If the TMSU_TEST_MEDIA_DIR env var is set, additionally test on
+the live TMSU database this variable points to."
   (declare (indent 0))
   `(cl-letf (((symbol-function 'tmsu-get-tags) #'tmsu-mock-get-tags)
              ((symbol-function 'tmsu-get-values) #'tmsu-mock-get-values))
