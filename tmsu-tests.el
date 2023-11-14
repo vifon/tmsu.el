@@ -59,7 +59,8 @@ the live TMSU database this variable points to."
                      (all-completions input completion-table))))
        (`(,input ,expected)
         (should (equal (try-completion input completion-table)
-                       expected)))))
+                       expected)))
+       (_ (error "Bad test spec"))))
    test-specs))
 
 
