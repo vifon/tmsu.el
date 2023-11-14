@@ -11,7 +11,7 @@
 (ert-deftest tmsu-test-completion-assignment ()
   (skip-unless (getenv "TMSU_TEST_MEDIA_DIR"))
   (let* ((default-directory (getenv "TMSU_TEST_MEDIA_DIR"))
-         (completion-table (tmsu--completion tmsu--key-value-regex)))
+         (completion-table (tmsu-completion-table-assignment)))
     (should (equal
              (try-completion "gen" completion-table)
              "genre"))
@@ -33,12 +33,16 @@
     (should-not (try-completion "year < 19" completion-table))
     (should-not (try-completion "year > 19" completion-table))
     (should-not (try-completion "year <= 19" completion-table))
-    (should-not (try-completion "year >= 19" completion-table))))
+    (should-not (try-completion "year >= 19" completion-table))
+
+    (should (equal
+             (try-completion "staff=Makoto" completion-table)
+             "staff=Makoto Shinkai"))))
 
 (ert-deftest tmsu-test-completion-query ()
   (skip-unless (getenv "TMSU_TEST_MEDIA_DIR"))
   (let* ((default-directory (getenv "TMSU_TEST_MEDIA_DIR"))
-         (completion-table (tmsu--completion tmsu--expression-regex)))
+         (completion-table (tmsu-completion-table-expression)))
     (should (equal
              (try-completion "gen" completion-table)
              "genre"))
@@ -65,4 +69,8 @@
     (should (try-completion "year < 19" completion-table))
     (should (try-completion "year > 19" completion-table))
     (should (try-completion "year <= 19" completion-table))
-    (should (try-completion "year >= 19" completion-table))))
+    (should (try-completion "year >= 19" completion-table))
+
+    (should (equal
+             (try-completion "staff=Makoto" completion-table)
+             "staff=Makoto\\ Shinkai"))))
