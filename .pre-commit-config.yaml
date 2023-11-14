@@ -13,6 +13,7 @@ repos:
     - id: shellcheck
     - id: elisp-check-parens
     - id: elisp-checkdoc
+      exclude: '^tmsu-tests.el$'
     - id: elisp-package-lint
       args: [--main-file, tmsu.el]
       files: |
@@ -20,6 +21,7 @@ repos:
         tmsu\.el|
         tmsu-[^/]+\.el
         )$
+      exclude: '^tmsu-tests.el$'
     - id: elisp-package-lint
       args: [--main-file, ol-tmsu.el]
       files: '^ol-tmsu\.el$'
@@ -35,7 +37,19 @@ repos:
         tmsu\.el|
         tmsu-[^/]+\.el
         )$
+      exclude: '^tmsu-tests.el$'
     - id: elisp-lint
       args: [--main-file, ol-tmsu.el]
       files: '^ol-tmsu\.el$'
     - id: elisp-lint-cleanup
+
+- repo: local
+  hooks:
+    - id: unittests
+      name: Run unittests
+      language: system
+      entry: >
+        emacs -Q --batch
+        -L . -l tmsu-tests.el
+        -f ert-run-tests-batch-and-exit
+      pass_filenames: false
