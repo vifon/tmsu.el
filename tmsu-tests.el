@@ -64,6 +64,8 @@ the live TMSU database this variable points to."
    test-specs))
 
 
+;;; Test tmsu.el
+
 (ert-deftest tmsu-test-escaping ()
   (should (equal (tmsu--escape-value "foo bar") "foo\\ bar"))
   (should (equal (tmsu--escape-value "foo\\ bar") "foo\\\\\\ bar"))
@@ -110,3 +112,34 @@ the live TMSU database this variable points to."
        ("year <= 19"     t)
        ("year >= 19"     t)
        ("staff=Makoto"   "staff=Makoto\\ Shinkai")))))
+
+
+;;; Test tmsu-dired.el
+
+(require 'tmsu-dired)
+
+(ert-deftest tmsu-dired-test-preprocess-query ()
+  (mapc (lambda (spec)
+          (pcase spec
+            (`(,query ,expected)
+             (should (equal (tmsu-dired--preprocess-query query)
+                            expected)))
+            (_ (error "Bad test spec"))))
+        '((("genre=comedy" "year<2020")
+           ("genre=comedy" "year<2020"))
+          (("genre=comedy or genre=cyberpunk")
+           ("genre=comedy or genre=cyberpunk"))
+          (("genre=comedy or genre=cyberpunk" "year<2020")
+           ("(genre=comedy or genre=cyberpunk)" "year<2020"))
+          (("genre=comedy and year<2020" "year>2000")
+           ("(genre=comedy and year<2020)" "year>2000"))
+          (("genre=comedy and year<2020 and year>2000")
+           ("genre=comedy and year<2020 and year>2000"))
+          (("genre=comedyand year<2020" "year>2000")
+           ("genre=comedyand year<2020" "year>2000"))
+          (("genre=comedy andyear<2020" "year>2000")
+           ("genre=comedy andyear<2020" "year>2000"))
+          (("genre=comedyor year<2020" "year>2000")
+           ("genre=comedyor year<2020" "year>2000"))
+          (("genre=comedy oryear<2020" "year>2000")
+           ("genre=comedy oryear<2020" "year>2000")))))
