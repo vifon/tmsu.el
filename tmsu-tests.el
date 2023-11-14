@@ -9,6 +9,38 @@
   (should (equal (tmsu--escape-value "foo <bar>") "foo\\ \\<bar\\>"))
   (should (equal (tmsu--escape-value "foo (bar)") "foo\\ \\(bar\\)")))
 
+
+(defvar tmsu-mock-tags
+  '("genre" "year" "staff"))
+
+(defvar tmsu-mock-values
+  '(("genre" . ("comedy" "cyberpunk" "action" "horror"))
+    ("year" . ("1979" "1991"
+               "2001" "2003" "2009"
+               "2011"
+               "2023"))
+    ("staff" . ("Makoto Shinkai" "Gen Urobuchi"))))
+
+(defun tmsu-mock-get-tags ()
+  tmsu-mock-tags)
+
+(defun tmsu-mock-get-values (&optional tag)
+  (if tag
+      (cdr (assoc tag tmsu-mock-values))
+    ;; Do *not* replace with mapcan, it's destructive.
+    (apply #'append (mapcar #'cdr tmsu-mock-values))))
+
+(defmacro tmsu-with-mocks (&rest body)
+  (declare (indent 0))
+  (if (getenv "TMSU_TEST_MEDIA_DIR")
+      `(let ((default-directory (getenv "TMSU_TEST_MEDIA_DIR")))
+         (warn "Warning, testing TMSU on live data: %s" default-directory)
+         ,@body)
+    `(cl-letf (((symbol-function 'tmsu-get-tags) #'tmsu-mock-get-tags)
+               ((symbol-function 'tmsu-get-values) #'tmsu-mock-get-values))
+       ,@body)))
+
+
 (defun tmsu-test-completions (completion-table test-specs)
   (mapc
    (lambda (spec)
@@ -31,11 +63,9 @@
    test-specs))
 
 (ert-deftest tmsu-test-completion-assignment ()
-  (skip-unless (getenv "TMSU_TEST_MEDIA_DIR"))
-  (let* ((default-directory (getenv "TMSU_TEST_MEDIA_DIR"))
-         (completion-table (tmsu-completion-table-assignment)))
+  (tmsu-with-mocks
     (tmsu-test-completions
-     completion-table
+     (tmsu-completion-table-assignment)
      '(("gen"            "genre")
        ("genre="         "genre=")
        ("genre = "       nil)
@@ -53,11 +83,9 @@
        ("staff=Makoto"   "staff=Makoto Shinkai")))))
 
 (ert-deftest tmsu-test-completion-query ()
-  (skip-unless (getenv "TMSU_TEST_MEDIA_DIR"))
-  (let* ((default-directory (getenv "TMSU_TEST_MEDIA_DIR"))
-         (completion-table (tmsu-completion-table-expression)))
+  (tmsu-with-mocks
     (tmsu-test-completions
-     completion-table
+     (tmsu-completion-table-expression)
      '(("gen"            "genre")
        ("genre="         "genre=")
        ("genre = "       "genre = ")
