@@ -23,6 +23,7 @@ repos:
         )$
       exclude: '^tmsu-tests.el$'
     - id: elisp-package-lint
+      name: Run Emacs package-lint (org-mode integration)
       args: [--main-file, ol-tmsu.el]
       files: '^ol-tmsu\.el$'
     - id: no-elc
@@ -39,6 +40,7 @@ repos:
         )$
       exclude: '^tmsu-tests.el$'
     - id: elisp-lint
+      name: Run Emacs elisp-lint (org-mode integration)
       args: [--main-file, ol-tmsu.el]
       files: '^ol-tmsu\.el$'
     - id: elisp-lint-cleanup

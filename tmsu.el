@@ -1,6 +1,6 @@
 ;;; tmsu.el --- A basic TMSU interface    -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2022-2023  Wojciech Siewierski
+;; Copyright (C) 2022-2024  Wojciech Siewierski
 
 ;; Author: Wojciech Siewierski
 ;; URL: https://github.com/vifon/tmsu.el
