@@ -79,9 +79,11 @@ If no files are marked, uses the file at point."
   (interactive nil dired-mode)
   (unless (tmsu-database-p)
     (error "No TMSU database"))
-  (let ((tags-to-add (tmsu-read-tags
+  (let ((tags-to-add (completing-read-multiple
                       "Tags to add: "
-                      nil 'tmsu-dired-tags-history)))
+                      (tmsu-completion-table-assignment)
+                      nil nil nil
+                      'tmsu-dired-tags-history)))
     (dolist (file (dired-get-marked-files))
       (apply #'tmsu-tags-add file tags-to-add))))
 
@@ -97,10 +99,11 @@ The completing read offers the sum of tags of all the marked files."
     (error "No TMSU database"))
   (let* ((files (dired-get-marked-files))
          (tags-in-files (mapcan #'cdr (tmsu-get-tags-for-files files)))
-         (tags-to-remove (tmsu-read-tags
+         (tags-to-remove (completing-read-multiple
                           "Tags to remove: "
-                          nil 'tmsu-dired-tags-history nil t
-                          tags-in-files)))
+                          tags-in-files
+                          nil t nil
+                          'tmsu-dired-tags-history)))
     (dolist (file files)
       (apply #'tmsu-tags-remove file tags-to-remove))))
 

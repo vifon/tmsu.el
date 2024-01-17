@@ -272,22 +272,6 @@ TMSU commands."
          "untag" "--" (file-local-name file)
          tags))
 
-(defun tmsu-read-tags
-    (prompt &optional initial-input hist def require-match table)
-  "Read multiple tags with completion.
-
-PROMPT, INITIAL-INPUT, HIST, DEF, REQUIRE-MATCH and TABLE are
-passed to `completing-read-multiple', see its documentation for
-the details.
-
-TABLE can be passed to use instead of a call to
-`tmsu-completion-table-assignment'."
-  (completing-read-multiple
-   prompt
-   (or table (tmsu-completion-table-assignment))
-   nil
-   require-match initial-input hist def))
-
 ;;;###autoload
 (defun tmsu-edit (file)
   "Interactively edit the TMSU tags of FILE."
@@ -299,8 +283,10 @@ TABLE can be passed to use instead of a call to
          (tags-old (let ((tags (tmsu-get-tags file)))
                      (dolist (func tmsu-tag-list-preprocess-functions tags)
                        (setq tags (funcall func tags)))))
-         (tags-new (tmsu-read-tags
+         (tags-new (completing-read-multiple
                     (format-message "Tag `%s': " file-name)
+                    (tmsu-completion-table-assignment)
+                    nil nil
                     (string-join tags-old ",")
                     'tmsu-edit-history
                     (string-join (append tags-old
