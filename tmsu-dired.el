@@ -1,6 +1,6 @@
 ;;; tmsu-dired.el --- An interface between TMSU and Dired    -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2022-2023  Wojciech Siewierski
+;; Copyright (C) 2022-2024  Wojciech Siewierski
 
 ;; Author: Wojciech Siewierski
 ;; URL: https://github.com/vifon/tmsu.el
@@ -67,6 +67,42 @@ editing a regular file's tags."
                             file-at-point
                           (dired-current-directory))))
       (tmsu-edit file-to-edit))))
+
+(defvar tmsu-dired-tags-history nil
+  "Command history for `tmsu-dired-tags-add' and `tmsu-dired-tags-remove'.")
+
+;;;###autoload
+(defun tmsu-dired-tags-add ()
+  "Add tags to the marked files.
+
+If no files are marked, uses the file at point."
+  (interactive nil dired-mode)
+  (unless (tmsu-database-p)
+    (error "No TMSU database"))
+  (let ((tags-to-add (tmsu-read-tags
+                      "Tags to add: "
+                      nil 'tmsu-dired-tags-history)))
+    (dolist (file (dired-get-marked-files))
+      (apply #'tmsu-tags-add file tags-to-add))))
+
+;;;###autoload
+(defun tmsu-dired-tags-remove ()
+  "Remove tags from the marked files.
+
+If no files are marked, uses the file at point.
+
+The completing read offers the sum of tags of all the marked files."
+  (interactive nil dired-mode)
+  (unless (tmsu-database-p)
+    (error "No TMSU database"))
+  (let* ((files (dired-get-marked-files))
+         (tags-in-files (mapcan #'cdr (tmsu-get-tags-for-files files)))
+         (tags-to-remove (tmsu-read-tags
+                          "Tags to remove: "
+                          nil 'tmsu-dired-tags-history nil t
+                          tags-in-files)))
+    (dolist (file files)
+      (apply #'tmsu-tags-remove file tags-to-remove))))
 
 
 ;; This section is strongly inspired by find-dired.el (included in GNU
