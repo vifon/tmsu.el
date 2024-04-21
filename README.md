@@ -82,9 +82,7 @@ want to add the following snippet:
   (let ((orderless-style-dispatchers nil))
     (apply orig args)))
 
-(advice-add 'tmsu-dired-edit :around
-            #'call-without-orderless-dispatchers)
-(advice-add 'tmsu-dired-edit-directory :around
+(advice-add 'tmsu-edit :around
             #'call-without-orderless-dispatchers)
 (advice-add 'tmsu-dired-query :around
             #'call-without-orderless-dispatchers)
