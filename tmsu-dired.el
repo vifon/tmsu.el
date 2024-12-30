@@ -114,8 +114,8 @@ The completing read offers the sum of tags of all the marked files."
 
 (require 'find-dired)
 
-(defvar tmsu-dired-ls-switches "-lh")
-(defvar tmsu-dired-ls-subdir-switches "-alh")
+(defvar tmsu-dired-ls-switches "-alh")
+(defvar tmsu-dired-ls-subdir-switches nil)
 
 (defvar-local tmsu-dired-query-args nil
   "The QUERY argument used for this buffer's `tmsu-dired-query' call.")
@@ -296,7 +296,6 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
     (dired-mode dir tmsu-dired-ls-switches)
     (let ((map (make-sparse-keymap)))
       (set-keymap-parent map (current-local-map))
-      (define-key map (kbd "s") #'tmsu-dired-query)
       ;; It should be safe to reuse `kill-find' verbatim.
       (define-key map "\C-c\C-k" #'kill-find)
       (use-local-map map))
@@ -307,10 +306,11 @@ Interactively ask for the FLAGS only if \\[universal-argument] got passed."
 
     (setq-local bookmark-make-record-function #'tmsu-dired-bookmark-make-record)
 
-    (setq-local dired-sort-inhibit t)
+    (setq-local dired-sort-inhibit nil)
     (setq-local revert-buffer-function
                 (lambda (_ignore-auto _noconfirm)
-                  (let ((point (point)))
+                  (let ((point (point))
+                        (tmsu-dired-ls-switches dired-actual-switches))
                     (tmsu-dired-query dir query flags)
                     (setq-local tmsu-dired-goto point))))
     ;; Set subdir-alist so that Tree Dired will work:
